@@ -5,8 +5,12 @@
 ## Установка
 
 ```bash
-wget -O /tmp/Zapret-Manager.sh https://raw.githubusercontent.com/guglovich/Zapret-Manager-risc64/refs/heads/main/Zapret-Manager.sh
-sh /tmp/Zapret-Manager.sh
+sh <(wget -O - https://raw.githubusercontent.com/guglovich/Zapret-Manager-risc64/refs/heads/main/Zapret-Manager.sh)
+```
+
+После установки запуск через:
+```bash
+zms
 ```
 
 ## Изменения
