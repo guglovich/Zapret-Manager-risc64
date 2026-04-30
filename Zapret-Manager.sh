@@ -582,7 +582,7 @@ if [ -z "$WAN_IP" ] || [ "$WAN_IP" = "не определён" ]; then WAN_IP="�
 SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"
 PORT_IN_RS="${PORT_IN_RS:-2443}"
-FAKETLS_DOMAIN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
+FAKETLS_DOMAIN_RS="$(grep -oP '--listen-faketls-domain\s+\K[^[:space:]]+' "$INIT_PATH_RS" 2>/dev/null || echo "")"
 if [ -n "$FAKETLS_DOMAIN_RS" ]; then PREFIX="ee"; PROXY_TYPE="Faketls ($FAKETLS_DOMAIN_RS)"; else PREFIX="dd"; PROXY_TYPE="MTProto"; fi
 echo -e "\n${YELLOW}Текущий хост:${NC} 0.0.0.0 (все интерфейсы)"
 echo -e "${YELLOW}Тип прокси:${NC} $PROXY_TYPE"
