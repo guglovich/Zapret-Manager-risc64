@@ -594,14 +594,14 @@ install_TG_RS() {
   
   LATEST_TAG_RS="v1.4.1"
   DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
-  curl -L --connect-timeout 10 --max-time 60 -o "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
+  wget -q -O "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
 printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$SECRET" > /etc/init.d/tg-ws-proxy-rs
 chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs enable; /etc/init.d/tg-ws-proxy-rs start; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}Сервис ${NC}TG WS Proxy Rust${GREEN} запущен!${NC}\n"; else echo -e "\n${RED}Сервис TG WS Proxy Rust не запущен!${NC}\n"; fi; PAUSE; }
 # ОБНОВЛЕНИЕ RUST С СОХРАНЕНИЕМ НАСТРОЕК
 update_TG_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Обновление TG WS Proxy Rust${NC}"
-echo -e "${CYAN}Останавливаем сервис...${NC}"; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; sleep 1; pkill -9 tg-ws-proxy-rs 2>/dev/null; sleep 1
+echo -e "${CYAN}Останавливаем сервис...${NC}"; pkill -9 tg-ws-proxy-rs 2>/dev/null; sleep 2; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; sleep 2
 echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if ! command -v curl >/dev/null 2>&1; then echo -e "${CYAN}Устанавливаем ${NC}curl"; $UPDATE >/dev/null 2>&1 && $INSTALL curl >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка установки curl${NC}\n"; PAUSE; return 1; }; fi
 echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v1.4.1"
@@ -622,14 +622,16 @@ install_TG_RS_FAKETLS() {
   
   if [ -f "$BIN_PATH_RS" ]; then
     echo -e "${CYAN}Останавливаем старый сервис...${NC}"
+    pkill -9 tg-ws-proxy-rs 2>/dev/null
+    sleep 2
     /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1
-    sleep 1
+    sleep 2
   fi
   
   echo -e "${CYAN}Скачиваем tg-ws-proxy-rs${NC}"
   LATEST_TAG_RS="v1.4.1"
   DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
-  curl -L --connect-timeout 10 --max-time 60 -o "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
+  wget -q -O "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
   
