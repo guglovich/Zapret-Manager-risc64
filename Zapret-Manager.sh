@@ -590,42 +590,21 @@ get_arch_RS() { case "$ARCH" in riscv64*|riscv*) echo "tg-ws-proxy" ;; aarch64*)
 delete_TG_RS() { echo -e "\n${MAGENTA}Удаляем TG WS Proxy Rust${NC}"; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; /etc/init.d/tg-ws-proxy-rs disable >/dev/null 2>&1; rm -rf "$BIN_PATH_RS" "$INIT_PATH_RS"; echo -e "TG WS Proxy Rust ${GREEN}удалён!${NC}\n"; PAUSE; }
 install_TG_RS() { 
   echo -e "\n${MAGENTA}Устанавливаем TG WS Proxy Rust${NC}"
-  ARCH_FILE_RS="$(get_arch_RS)" || { echo -e "\n${RED}Архитектура не поддерживается:${NC} $ARCH\n"; PAUSE; return 1; }
-  echo -e "${CYAN}Скачиваем и устанавливаем${NC} $ARCH_FILE_RS"
+  echo -e "${CYAN}Скачиваем tg-ws-proxy-rs${NC}"
   
-  if [ "$ARCH" = "riscv64" ] || [ "$ARCH" = "riscv" ]; then
-    LATEST_TAG_RS="$(curl -Ls --connect-timeout 10 --max-time 30 -o /dev/null -w '%{url_effective}' https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/latest | sed 's#.*/tag/##')"
-    [ -z "$LATEST_TAG_RS" ] && { echo -e "\n${RED}Не удалось получить версию${NC} TG WS Proxy Rust\n"; PAUSE; return 1; }
-    DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/$ARCH_FILE_RS"
-    curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-  else
-    LATEST_TAG_RS="$(curl -Ls --connect-timeout 10 --max-time 30 -o /dev/null -w '%{url_effective}' https://github.com/valnesfjord/tg-ws-proxy-rs/releases/latest | sed 's#.*/tag/##')"
-    [ -z "$LATEST_TAG_RS" ] && { echo -e "\n${RED}Не удалось получить версию${NC} TG WS Proxy Rust\n"; PAUSE; return 1; }
-    DOWNLOAD_URL_RS="https://github.com/valnesfjord/tg-ws-proxy-rs/releases/download/$LATEST_TAG_RS/$ARCH_FILE_RS"
-    curl -L --connect-timeout 10 --max-time 60 -o "$TMP_ARCHIVE_RS" "$DOWNLOAD_URL_RS" >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-    rm -rf "$TMP_DIR_RS"; mkdir -p "$TMP_DIR_RS"
-    tar -xzf "$TMP_ARCHIVE_RS" -C "$TMP_DIR_RS" || { echo -e "\n${RED}Ошибка распаковки${NC}\n"; PAUSE; return 1; }
-    mv "$TMP_DIR_RS"/tg-ws-proxy* "$BIN_PATH_RS"
-    rm -rf "$TMP_DIR_RS" "$TMP_ARCHIVE_RS"
-  fi
+  LATEST_TAG_RS="v1.4.1"
+  DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
+  curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x "$BIN_PATH_RS"
 printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$SECRET" > /etc/init.d/tg-ws-proxy-rs
 chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs enable; /etc/init.d/tg-ws-proxy-rs start; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}Сервис ${NC}TG WS Proxy Rust${GREEN} запущен!${NC}\n"; else echo -e "\n${RED}Сервис TG WS Proxy Rust не запущен!${NC}\n"; fi; PAUSE; }
 # ОБНОВЛЕНИЕ RUST С СОХРАНЕНИЕМ НАСТРОЕК
 update_TG_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Обновление TG WS Proxy Rust${NC}"
 echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
-ARCH_FILE_RS="$(get_arch_RS)" || { echo -e "\n${RED}Архитектура не поддерживается:${NC} $(uname -m)\n"; PAUSE; return 1; }
 if ! command -v curl >/dev/null 2>&1; then echo -e "${CYAN}Устанавливаем ${NC}curl"; $UPDATE >/dev/null 2>&1 && $INSTALL curl >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка установки curl${NC}\n"; PAUSE; return 1; }; fi
-echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="$(curl -Ls --connect-timeout 10 --max-time 30 -o /dev/null -w '%{url_effective}' https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/latest | sed 's#.*/tag/##')"; [ -z "$LATEST_TAG_RS" ] && { echo -e "\n${RED}Не удалось получить версию${NC}\n"; PAUSE; return 1; }
-if [ "$ARCH" = "riscv64" ] || [ "$ARCH" = "riscv" ]; then
-  DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/$ARCH_FILE_RS"
-  curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-else
-  DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/$ARCH_FILE_RS"
-  curl -L --connect-timeout 10 --max-time 60 -o "$TMP_ARCHIVE_RS" "$DOWNLOAD_URL_RS" >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-  rm -rf "$TMP_DIR_RS"; mkdir -p "$TMP_DIR_RS"; tar -xzf "$TMP_ARCHIVE_RS" -C "$TMP_DIR_RS" || { echo -e "\n${RED}Ошибка распаковки${NC}\n"; PAUSE; return 1; }
-  mv "$TMP_DIR_RS"/tg-ws-proxy* "$BIN_PATH_RS"; rm -rf "$TMP_DIR_RS" "$TMP_ARCHIVE_RS"
-fi
+echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v1.4.1"
+DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
+curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
 chmod +x "$BIN_PATH_RS"
 echo -e "${CYAN}Восстанавливаем настройки...${NC}"; if [ -n "$FAKETLS_DOMAIN" ]; then printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" "$FAKETLS_DOMAIN" > /etc/init.d/tg-ws-proxy-rs; else printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" > /etc/init.d/tg-ws-proxy-rs; fi
 chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs restart; sleep 1; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}TG WS Proxy Rust обновлён!${NC}\n"; else echo -e "\n${RED}Ошибка запуска!${NC}\n"; fi; PAUSE; }
@@ -639,28 +618,10 @@ install_TG_RS_FAKETLS() {
   SECRET_FAKE="$(head -c16 /dev/urandom | hexdump -e '16/1 "%02x"' | tr -d ' ')"
   PORT_FAKE="2443"
   
-  echo -e "${CYAN}Определяем архитектуру...${NC}"
-  if command -v opkg >/dev/null 2>&1; then ARCH="$(opkg print-architecture | awk '{print $2}' | tail -n1)"
-  elif command -v apk >/dev/null 2>&1; then ARCH="$(apk --print-arch 2>/dev/null)"
-  else ARCH="$(uname -m)"; fi
-  
-  ARCH_FILE_RS="$(get_arch_RS)" || { echo -e "\n${RED}Архитектура не поддерживается:${NC} $(uname -m)\n"; PAUSE; return 1; }
-  
-  echo -e "${CYAN}Скачиваем и устанавливаем${NC} $ARCH_FILE_RS"
-  LATEST_TAG_RS="$(curl -Ls --connect-timeout 10 --max-time 30 -o /dev/null -w '%{url_effective}' https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/latest 2>/dev/null | sed 's#.*/tag/##')"
-  
-  [ -z "$LATEST_TAG_RS" ] && { echo -e "\n${RED}Не удалось получить версию${NC} TG WS Proxy Rust\n"; PAUSE; return 1; }
-  
-  DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/$ARCH_FILE_RS"
-  if [ "$ARCH" = "riscv64" ] || [ "$ARCH" = "riscv" ]; then
-    curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" 2>/dev/null || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-  else
-    curl -L --connect-timeout 10 --max-time 60 -o "$TMP_ARCHIVE_RS" "$DOWNLOAD_URL_RS" 2>/dev/null || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-    rm -rf "$TMP_DIR_RS"; mkdir -p "$TMP_DIR_RS"
-    tar -xzf "$TMP_ARCHIVE_RS" -C "$TMP_DIR_RS" || { echo -e "\n${RED}Ошибка распаковки${NC}\n"; PAUSE; return 1; }
-    mv "$TMP_DIR_RS"/tg-ws-proxy* "$BIN_PATH_RS"
-    rm -rf "$TMP_DIR_RS" "$TMP_ARCHIVE_RS"
-  fi
+  echo -e "${CYAN}Скачиваем tg-ws-proxy-rs${NC}"
+  LATEST_TAG_RS="v1.4.1"
+  DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
+  curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x "$BIN_PATH_RS"
   
   printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
