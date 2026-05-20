@@ -1,12 +1,22 @@
 ru
 рф
 su
+xn--p1ai
+xn--80asehdb
+#################################### Разное
+hf.co
 qwen.ai
+iiko.it
+okko.tv
 avito.st
+habr.com
 nexon.com
+boosty.to
 ottai.com
 ufanet.tv
 trovo.live
+beeline.tv
+ubuntu.com
 xsolla.com
 ip-api.com
 gstatic.com
@@ -16,10 +26,42 @@ ipstream.one
 godville.net
 voidboost.cc
 moondroplab.tech
+rockstargames.com
+supporter-files.nexus-cdn.com
 #################################### VK
+vk.cc
+vk.me
 vk.com
+my.com
+mvk.com
+vk.link
+vk.team
+vkgo.app
+skbx.pro
+youla.io
 mycdn.me
+mradx.net
+vk-cdn.me
+vk.design
+vk-cdn.net
+vk.company
+vklive.app
+vkuser.net
+bizmrg.com
 userapi.com
+vk-apps.com
+vkcache.com
+vkclips.app
+skillbox.pro
+tarantool.io
+vk-portal.net
+vkuserlive.net
+vkmessenger.app
+vkmessenger.com
+vkuseraudio.com
+vkuseraudio.net
+vkuservideo.com
+vkuservideo.net
 #################################### Epicgames
 easy.ac
 fab.com
@@ -252,10 +294,6 @@ myhuaweicloud.com
 huaweicloud-dns.cn
 huaweicloud-dns.com
 huaweicloud-dns.org
-#################################### Okko
-okko.tv
-#################################### Beeline
-beeline.tv
 #################################### Delta Force
 volces.com
 wetest.net
@@ -311,8 +349,6 @@ samsungmobile.com
 samsung-sm-ds.com
 samsungcloudplatform.com
 samsungcloudsolution.com
-#################################### Rockstar
-rockstargames.com
 #################################### Tuya
 tuya.com
 iot334.com
@@ -329,6 +365,7 @@ tclhome.com
 tclclouds.com
 #################################### Call Of Duty
 azure.com
+azureedge.net
 demonware.net
 callofduty.com
 activision.com
@@ -387,4 +424,22 @@ ac-prp-ap.codefusion.technology
 ac-survey.codefusion.technology
 ac-fallback.codefusion.technology
 ac-fileshare.codefusion.technology
+#################################### Wordpress
+wp.com
+9to5mac.com
+wptavern.com
+wordpress.com
+9to5google.com
+techcrunch.com
+#################################### PUBG
+pubg.com
+pubgno1.cn
+pubgtool.com
+kraftonde.com
+pubghelper.com
+pubg1.battleye.com
+playbattlegrounds.com
+#################################### Tumblr
+tmblr.com
+tumblr.com
 ####################################
