@@ -641,6 +641,15 @@ install_TG_RS_FAKETLS() {
   /etc/init.d/tg-ws-proxy-rs enable
   /etc/init.d/tg-ws-proxy-rs start
   
+  sleep 3
+  
+  if ! pidof tg-ws-proxy-rs >/dev/null 2>&1; then
+    echo -e "${RED}Сервис не запущен, пробуем вручную...${NC}"
+    /usr/bin/tg-ws-proxy-rs --help 2>&1 | head -5 || echo "Ошибка бинарника"
+    /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret "$SECRET_FAKE" --listen-faketls-domain "$FAKE_DOMAIN" &
+    sleep 3
+  fi
+  
   if pidof tg-ws-proxy-rs >/dev/null 2>&1; then
     echo -e "${GREEN}Сервис ${NC}TG WS Proxy Rust${GREEN} запущен!${NC}\n"
     echo -e "${YELLOW}Настройки:${NC}"
