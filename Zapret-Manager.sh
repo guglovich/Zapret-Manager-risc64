@@ -602,7 +602,7 @@ chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs enable; /etc/init.d/tg-ws-p
 # ОБНОВЛЕНИЕ RUST С СОХРАНЕНИЕМ НАСТРОЕК
 update_TG_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Обновление TG WS Proxy Rust${NC}"
 echo -e "${CYAN}Останавливаем сервис...${NC}"; pkill -9 tg-ws-proxy-rs 2>/dev/null; sleep 2; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; sleep 2
-echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
+echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32,\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if ! command -v curl >/dev/null 2>&1; then echo -e "${CYAN}Устанавливаем ${NC}curl"; $UPDATE >/dev/null 2>&1 && $INSTALL curl >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка установки curl${NC}\n"; PAUSE; return 1; }; fi
 echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v1.4.1"
 DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
@@ -624,6 +624,7 @@ install_TG_RS_FAKETLS() {
   done
   SECRET_FAKE_FULL="ee${SECRET_FAKE}${FAKE_DOMAIN_HEX}"
   PORT_FAKE="2443"
+  WAN_IP="$(curl -s --max-time 5 ifconfig.me 2>/dev/null)"
   
   if [ -f "$BIN_PATH_RS" ]; then
     echo -e "${CYAN}Останавливаем старый сервис...${NC}"
@@ -663,7 +664,7 @@ install_TG_RS_FAKETLS() {
     echo -e "${YELLOW}Порт:${NC} $PORT_FAKE"
 echo -e "${YELLOW}Ключ:${NC} $SECRET_FAKE_FULL"
     echo -e "${YELLOW}Ссылка для подключения:${NC}"
-    echo "tg://proxy?server=$LAN_IP&port=$PORT_FAKE&secret=$SECRET_FAKE_FULL"
+    echo "tg://proxy?server=$WAN_IP&port=$PORT_FAKE&secret=$SECRET_FAKE_FULL"
   else
     echo -e "\n${RED}Сервис TG WS Proxy Rust не запущен!${NC}\n"
   fi
@@ -672,7 +673,7 @@ echo -e "${YELLOW}Ключ:${NC} $SECRET_FAKE_FULL"
 # ВНЕШНИЙ ДОСТУП RUST
 ext_access_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Настройка внешнего доступа TG WS Proxy Rust${NC}"
 WAN_IP="$(curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "не определён")"; if [ -z "$WAN_IP" ] || [ "$WAN_IP" = "не определён" ]; then WAN_IP="узнай на ifconfig.me"; fi
-SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"
+SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32,\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"
 FAKETLS_DOMAIN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_DOMAIN_RS" ]; then PREFIX="ee"; PROXY_TYPE="Faketls ($FAKETLS_DOMAIN_RS)"; else PREFIX="dd"; PROXY_TYPE="MTProto"; fi
 echo -e "\n${YELLOW}Текущий хост:${NC} 0.0.0.0 (все интерфейсы)"; echo -e "${YELLOW}Тип прокси:${NC} $PROXY_TYPE"; echo -e "${YELLOW}Порт:${NC} $PORT_IN_RS"; echo -e "${YELLOW}Белый IP:${NC} $WAN_IP"
@@ -704,7 +705,7 @@ clear; echo -e "${MAGENTA}Меню TG WS Proxy${NC}\n"; TGSTATUS=""; pidof tg-ws
 if [ -n "$TGSTATUS" ]; then echo -e "${YELLOW}TG WS Proxy:${NC} ${GREEN}запущен [$TGSTATUS]${NC}"; else echo -e "${YELLOW}TG WS Proxy:${NC} ${GREEN}не установлен${NC}"; fi
 if [ -n "$INSTALLED_VER_GO" ]; then if [ "$GO_ACTION" = "update" ]; then echo -e "${YELLOW}TG WS Proxy Go MTProto версия:${NC} ${RED}$INSTALLED_VER_GO${NC}"; else echo -e "${YELLOW}TG WS Proxy Go MTProto версия:${NC} ${GREEN}$INSTALLED_VER_GO${NC}"; fi; fi
 if pidof tg-ws-proxy-go >/dev/null 2>&1 && [ -f "$BIN_PATH_GO" ] && [ -f "$INIT_PATH_GO" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Go SOCKS5${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} SOCKS5\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 1080${NC}\n${YELLOW}Ссылка для подключения:${NC}\ntg://socks?server=$LAN_IP&port=1080"; fi
-if pgrep -f tg-ws-proxy-rs >/dev/null 2>&1 && [ -f "$BIN_PATH_RS" ] && [ -f "$INIT_PATH_RS" ]; then SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; FAKETLS_IN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
+if pgrep -f tg-ws-proxy-rs >/dev/null 2>&1 && [ -f "$BIN_PATH_RS" ] && [ -f "$INIT_PATH_RS" ]; then SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32,\}\).*/\1/p' "$INIT_PATH_RS")"; FAKETLS_IN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_IN_RS" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust (Faketls)${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto (Faketls)\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} ee$SECRET_IN_RS\n${YELLOW}SNI домен:${NC} $FAKETLS_IN_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=ee$SECRET_IN_RS"; else echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} dd$SECRET_IN_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=dd$SECRET_IN_RS"; fi; fi
 if pidof tg-ws-proxy >/dev/null 2>&1 && [ -f "/etc/init.d/tg-ws-proxy" ]; then SECRET_CONF="$(grep '^SECRET=' $SECRET_FILE 2>/dev/null | cut -d'=' -f2)"; echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Go MTProto${YELLOW}:${NC}"; echo -e "${YELLOW}Тип прокси:${NC} MTProto"
 echo -e "${YELLOW}Хост:${NC} $LAN_IP"; echo -e "${YELLOW}Порт:${NC} 1443"; echo -e "${YELLOW}Ключ:${NC} dd$SECRET_CONF"; echo -e "${YELLOW}Ссылка для подключения:${NC}"; echo -e "tg://proxy?server=$LAN_IP&port=1443&secret=dd$SECRET_CONF"; fi
