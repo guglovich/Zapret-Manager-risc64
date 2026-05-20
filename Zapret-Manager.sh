@@ -640,7 +640,7 @@ install_TG_RS_FAKETLS() {
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
   
-  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
+  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE_FULL" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
   
   chmod +x "$INIT_PATH_RS"
   /etc/init.d/tg-ws-proxy-rs enable
@@ -651,7 +651,7 @@ install_TG_RS_FAKETLS() {
   if ! pidof tg-ws-proxy-rs >/dev/null 2>&1; then
     echo -e "${RED}Сервис не запущен, пробуем вручную...${NC}"
     /usr/bin/tg-ws-proxy-rs --help 2>&1 | head -5 || echo "Ошибка бинарника"
-    /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret "$SECRET_FAKE" --listen-faketls-domain "$FAKE_DOMAIN" &
+    /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret "$SECRET_FAKE_FULL" --listen-faketls-domain "$FAKE_DOMAIN" &
     sleep 3
   fi
   
