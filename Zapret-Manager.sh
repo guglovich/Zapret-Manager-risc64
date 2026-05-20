@@ -618,6 +618,8 @@ install_TG_RS_FAKETLS() {
   [ -z "$FAKE_DOMAIN" ] && { echo -e "\n${RED}Домен не введён!${NC}\n"; PAUSE; return 1; }
   
   SECRET_FAKE="$(head -c16 /dev/urandom | hexdump -e '16/1 "%02x"' | tr -d ' ')"
+  FAKE_DOMAIN_HEX=$(printf '%s' "$FAKE_DOMAIN" | xxd -p | tr -d '\n')
+  SECRET_FAKE_FULL="ee${SECRET_FAKE}${FAKE_DOMAIN_HEX}"
   PORT_FAKE="2443"
   
   if [ -f "$BIN_PATH_RS" ]; then
@@ -635,7 +637,7 @@ install_TG_RS_FAKETLS() {
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
   
-  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "ee$SECRET_FAKE" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
+  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
   
   chmod +x "$INIT_PATH_RS"
   /etc/init.d/tg-ws-proxy-rs enable
@@ -656,10 +658,9 @@ install_TG_RS_FAKETLS() {
     echo -e "${YELLOW}Тип прокси:${NC} MTProto (Faketls)"
     echo -e "${YELLOW}Хост:${NC} $LAN_IP"
     echo -e "${YELLOW}Порт:${NC} $PORT_FAKE"
-    echo -e "${YELLOW}Ключ:${NC} ee$SECRET_FAKE"
-    echo -e "${YELLOW}SNI домен:${NC} $FAKE_DOMAIN"
+echo -e "${YELLOW}Ключ:${NC} $SECRET_FAKE_FULL"
     echo -e "${YELLOW}Ссылка для подключения:${NC}"
-    echo "tg://proxy?server=$LAN_IP&port=$PORT_FAKE&secret=ee$SECRET_FAKE"
+    echo "tg://proxy?server=$LAN_IP&port=$PORT_FAKE&secret=$SECRET_FAKE_FULL"
   else
     echo -e "\n${RED}Сервис TG WS Proxy Rust не запущен!${NC}\n"
   fi
