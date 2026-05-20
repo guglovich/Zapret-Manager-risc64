@@ -618,7 +618,10 @@ install_TG_RS_FAKETLS() {
   [ -z "$FAKE_DOMAIN" ] && { echo -e "\n${RED}Домен не введён!${NC}\n"; PAUSE; return 1; }
   
   SECRET_FAKE="$(head -c16 /dev/urandom | hexdump -e '16/1 "%02x"' | tr -d ' ')"
-  FAKE_DOMAIN_HEX=$(printf '%s' "$FAKE_DOMAIN" | xxd -p | tr -d '\n')
+  FAKE_DOMAIN_HEX=""
+  for i in $(printf '%s' "$FAKE_DOMAIN" | od -A n -t x1 | tr -d ' \n'); do
+    FAKE_DOMAIN_HEX="${FAKE_DOMAIN_HEX}${i}"
+  done
   SECRET_FAKE_FULL="ee${SECRET_FAKE}${FAKE_DOMAIN_HEX}"
   PORT_FAKE="2443"
   
