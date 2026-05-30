@@ -4,8 +4,10 @@
 # =========================================
 ZAPRET_MANAGER_VERSION="9.6-risc64"; STR_VERSION_AUTOINSTALL="v7"
 ZAPRET_VERSION="72.20260307"; GO_VER="0.7.2"; PODKOP_LATEST_VER="0.7.27"
+
 git="githubusercontent.com"; if ! grep -q "raw.$git" /etc/hosts; then echo -e "\033[1;36mДля корректной работы скрипта добавляем домены \033[0mGitHub\033[1;36m в \033[0m/etc/hosts\033[0m"
 printf "#$git\n185.199.109.133 raw.$git release-assets.$git\n185.199.108.133 private-user-images.$git gist.$git avatars.$git\n" >> /etc/hosts; /etc/init.d/dnsmasq restart >/dev/null 2>&1; echo -e "\033[0;32mДомены \033[0mGitHub\033[0;32m добавлены!\033[0m"; fi
+
 LAN_IP=$(uci get network.lan.ipaddr 2>/dev/null | cut -d/ -f1)
 DOMAINS="rr1---sn-gvnuxaxjvh-jx3z.googlevideo.com rr1---sn-gvnuxaxjvh-jx3l.googlevideo.com rr1---sn-gvnuxaxjvh-jx3s.googlevideo.com"
 PORTS_UDP="88,1024-2407,2409-4499,4502-19293,19345-49999,50101-65535"; PORTS_TCP="2802,2302,2502,6112-6119,6695-6710,25565,27015-27030,27036-27037,50001"
@@ -242,31 +244,28 @@ if [ -f "$CONF" ] && { grep -q -- "--hostlist=/opt/zapret/ipset/zapret-hosts-use
 # ==========================================
 # Стратегии
 # ==========================================
-strategy_v1() { printf '%s\n' "#v1" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=split2" "--dpi-desync-split-seqovl=681" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/stun.bin"; }
-strategy_v2() { printf '%s\n' "#v2" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake,multisplit"
-printf '%s\n' "--dpi-desync-split-seqovl=681" "--dpi-desync-split-pos=1" "--dpi-desync-fooling=ts" "--dpi-desync-repeats=8" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/stun.bin" "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com" ; }
-strategy_v3() { printf '%s\n' "#v3" "#Yv01" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--ip-id=zero" "--dpi-desync=multisplit" "--dpi-desync-split-seqovl=681" "--dpi-desync-split-pos=1" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin"
+strategy_v1() { printf '%s\n' "#v1" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
+printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=split2" "--dpi-desync-split-seqovl=681" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/stun.bin"; }
+strategy_v2() { printf '%s\n' "#v2" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
+printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-seqovl=681" "--dpi-desync-split-pos=1" "--dpi-desync-fooling=ts" "--dpi-desync-repeats=8" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/stun.bin" "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=www.google.com" ; }
+strategy_v3() { printf '%s\n' "#v3" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
 printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake,fakeddisorder" "--dpi-desync-split-pos=10,midsld" "--dpi-desync-fake-tls=/opt/zapret/files/fake/t2.bin"
 printf '%s\n' "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=m.ok.ru" "--dpi-desync-fake-tls=0x0F0F0F0F" "--dpi-desync-fake-tls-mod=none" "--dpi-desync-fakedsplit-pattern=/opt/zapret/files/fake/tls_clienthello_vk_com.bin"
 printf '%s\n' "--dpi-desync-split-seqovl=336" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_gosuslugi_ru.bin" "--dpi-desync-fooling=badseq,badsum" "--dpi-desync-badseq-increment=0"
 printf '%s\n' "--new" "--filter-udp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake" "--dpi-desync-repeats=6" "--dpi-desync-fake-quic=/opt/zapret/files/fake/quic_initial_www_google_com.bin"; }
-strategy_v4() { printf '%s\n' "#v4" "#Yv15" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-pos=2,sld" "--dpi-desync-fake-tls=0x0F0F0F0F" "--dpi-desync-fake-tls=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin"
-printf '%s\n' "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=google.com" "--dpi-desync-split-seqovl=2108" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badseq"
+strategy_v4() { printf '%s\n' "#v4" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
 printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=multisplit" "--dpi-desync-split-seqovl=582" "--dpi-desync-split-pos=1" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/stun.bin"
 printf '%s\n' "--new" "--filter-udp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake" "--dpi-desync-repeats=6" "--dpi-desync-fake-quic=/opt/zapret/files/fake/quic_initial_www_google_com.bin"; }
-strategy_v5() { printf '%s\n' "#v5" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake,fakeddisorder" "--dpi-desync-split-pos=1" "--dpi-desync-fake-tls=/opt/zapret/files/fake/stun.bin" "--dpi-desync-fake-tls-mod=none" "--dpi-desync-fakedsplit-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badseq,badsum" "--dpi-desync-badseq-increment=0"
+strategy_v5() { printf '%s\n' "#v5" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
+printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake,fakeddisorder" "--dpi-desync-split-pos=1" "--dpi-desync-fake-tls=/opt/zapret/files/fake/stun.bin" "--dpi-desync-fake-tls-mod=none" "--dpi-desync-fakedsplit-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badseq,badsum" "--dpi-desync-badseq-increment=0"
 printf '%s\n' "--new" "--filter-udp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake" "--dpi-desync-repeats=6" "--dpi-desync-fake-quic=/opt/zapret/files/fake/quic_initial_www_google_com.bin"; }
-strategy_v6() { printf '%s\n' "#v6" "#Yv03" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-pos=2,sld" "--dpi-desync-fake-tls=0x0F0F0F0F" "--dpi-desync-fake-tls=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin"
-printf '%s\n' "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=ggpht.com" "--dpi-desync-split-seqovl=620" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badsum,badseq"
+strategy_v6() { printf '%s\n' "#v6" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
 printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=i2.photo.2gis.com" "--dpi-desync-hostfakesplit-midhost=host-2" "--dpi-desync-split-seqovl=726" "--dpi-desync-fooling=badsum,badseq" "--dpi-desync-badseq-increment=0"; }
-strategy_v7() { printf '%s\n' "#v7" "#Yv03" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-pos=2,sld" "--dpi-desync-fake-tls=0x0F0F0F0F" "--dpi-desync-fake-tls=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin"
-printf '%s\n' "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=ggpht.com" "--dpi-desync-split-seqovl=620" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badsum,badseq"
+strategy_v7() { printf '%s\n' "#v7" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
 printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-seqovl=654" "--dpi-desync-split-pos=1" "--dpi-desync-fooling=badseq,badsum" "--dpi-desync-repeats=8" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/stun.bin" "--dpi-desync-fake-tls=/opt/zapret/files/fake/stun.bin" "--dpi-desync-badseq-increment=0"; }
-strategy_v8() { printf '%s\n' "#v8" "#Yv03" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-pos=2,sld" "--dpi-desync-fake-tls=0x0F0F0F0F" "--dpi-desync-fake-tls=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin"
-printf '%s\n' "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=ggpht.com" "--dpi-desync-split-seqovl=620" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badsum,badseq"
+strategy_v8() { printf '%s\n' "#v8" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
 printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=fake" "--dpi-desync-fooling=ts" "--dpi-desync-fake-tls=/opt/zapret/files/fake/4pda.bin" "--dpi-desync-fake-tls-mod=none"; }
-strategy_v9() { printf '%s\n' "#v9" "#Yv03" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=fake,multisplit" "--dpi-desync-split-pos=2,sld" "--dpi-desync-fake-tls=0x0F0F0F0F" "--dpi-desync-fake-tls=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin"
-printf '%s\n' "--dpi-desync-fake-tls-mod=rnd,dupsid,sni=ggpht.com" "--dpi-desync-split-seqovl=620" "--dpi-desync-split-seqovl-pattern=/opt/zapret/files/fake/tls_clienthello_www_google_com.bin" "--dpi-desync-fooling=badsum,badseq"
+strategy_v9() { printf '%s\n' "#v9" "#Yv08" "--filter-tcp=443" "--hostlist=/opt/zapret/ipset/zapret-hosts-google.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-hostfakesplit-mod=host=google.com" "--dpi-desync-fooling=ts"
 printf '%s\n' "--new" "--filter-tcp=443" "--hostlist-exclude=/opt/zapret/ipset/zapret-hosts-user-exclude.txt" "--dpi-desync=hostfakesplit" "--dpi-desync-fooling=badseq,badsum" "--dpi-desync-hostfakesplit-mod=host=mapgl.2gis.com" "--dpi-desync-badseq-increment=0"; }
 # ==========================================
 # Cтратегии Flowseal
@@ -588,49 +587,43 @@ echo -en "\n${YELLOW}Выберите зеркало: ${NC}"; read -r z; case "$
 # УСТАНОВКА RUST
 get_arch_RS() { case "$ARCH" in riscv64*|riscv*) echo "tg-ws-proxy" ;; aarch64*) echo "tg-ws-proxy-aarch64-unknown-linux-musl.tar.gz" ;; x86_64) echo "tg-ws-proxy-x86_64-unknown-linux-musl.tar.gz" ;; arm*) echo "tg-ws-proxy-armv7-unknown-linux-musleabihf.tar.gz" ;; mipsel*) echo "tg-ws-proxy-mipsel-unknown-linux-musl.tar.gz" ;; mips*) echo "tg-ws-proxy-mips-unknown-linux-musl.tar.gz" ;; *) echo -e "\n${RED}Архитектура не поддерживается: ${NC}$ARCH\n"; PAUSE; return 1 ;; esac }
 delete_TG_RS() { echo -e "\n${MAGENTA}Удаляем TG WS Proxy Rust${NC}"; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; /etc/init.d/tg-ws-proxy-rs disable >/dev/null 2>&1; rm -rf "$BIN_PATH_RS" "$INIT_PATH_RS"; echo -e "TG WS Proxy Rust ${GREEN}удалён!${NC}\n"; PAUSE; }
-install_TG_RS() { 
+install_TG_RS() {
   echo -e "\n${MAGENTA}Устанавливаем TG WS Proxy Rust${NC}"
   echo -e "${CYAN}Скачиваем tg-ws-proxy-rs${NC}"
-  
   LATEST_TAG_RS="v1.4.1"
   DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
   wget -q -O "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
-printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$SECRET" > /etc/init.d/tg-ws-proxy-rs
-chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs enable; /etc/init.d/tg-ws-proxy-rs start; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}Сервис ${NC}TG WS Proxy Rust${GREEN} запущен!${NC}\n"; else echo -e "\n${RED}Сервис TG WS Proxy Rust не запущен!${NC}\n"; fi; PAUSE; }
+  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$SECRET" > /etc/init.d/tg-ws-proxy-rs
+  chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs enable; /etc/init.d/tg-ws-proxy-rs start; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}Сервис ${NC}TG WS Proxy Rust${GREEN} запущен!${NC}\n"; else echo -e "\n${RED}Сервис TG WS Proxy Rust не запущен!${NC}\n"; fi; PAUSE; }
 # ОБНОВЛЕНИЕ RUST С СОХРАНЕНИЕМ НАСТРОЕК
 update_TG_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Обновление TG WS Proxy Rust${NC}"
 echo -e "${CYAN}Останавливаем сервис...${NC}"; pkill -9 tg-ws-proxy-rs 2>/dev/null; sleep 2; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; sleep 2
 echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_CHECK" ]; then
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32,\}\).*/\1/p' "$INIT_PATH_RS")"
+  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 else
   SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 fi; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if ! command -v curl >/dev/null 2>&1; then echo -e "${CYAN}Устанавливаем ${NC}curl"; $UPDATE >/dev/null 2>&1 && $INSTALL curl >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка установки curl${NC}\n"; PAUSE; return 1; }; fi
 echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v1.4.1"
 DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
-curl -L --connect-timeout 10 --max-time 60 -o "$BIN_PATH_RS" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-chmod +x "$BIN_PATH_RS"
-echo -e "${CYAN}Восстанавливаем настройки...${NC}"; if [ -n "$FAKETLS_DOMAIN" ]; then printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "ee$SECRET_IN_RS" "$FAKETLS_DOMAIN" > /etc/init.d/tg-ws-proxy-rs; else printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" > /etc/init.d/tg-ws-proxy-rs; fi
+curl -L --connect-timeout 10 --max-time 60 -o "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
+chmod +x /tmp/tg-ws-proxy-new; mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
+echo -e "${CYAN}Восстанавливаем настройки...${NC}"; if [ -n "$FAKETLS_DOMAIN" ]; then printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" "$FAKETLS_DOMAIN" > /etc/init.d/tg-ws-proxy-rs; else printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" > /etc/init.d/tg-ws-proxy-rs; fi
 chmod +x "$INIT_PATH_RS"; /etc/init.d/tg-ws-proxy-rs restart; sleep 1; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}TG WS Proxy Rust обновлён!${NC}\n"; else echo -e "\n${RED}Ошибка запуска!${NC}\n"; fi; PAUSE; }
 # УСТАНОВКА RUST С FAKETLS DOMAIN
-install_TG_RS_FAKETLS() { 
+install_TG_RS_FAKETLS() {
   echo -e "\n${MAGENTA}Установка TG WS Proxy Rust с Faketls Domain${NC}"
   echo -en "${YELLOW}Введите SNI домен ${NC}(например: google.com): "
   read FAKE_DOMAIN
   [ -z "$FAKE_DOMAIN" ] && { echo -e "\n${RED}Домен не введён!${NC}\n"; PAUSE; return 1; }
-  
   SECRET_FAKE="$(head -c16 /dev/urandom | hexdump -e '16/1 "%02x"' | tr -d ' ')"
-  FAKE_DOMAIN_HEX=""
-  for i in $(printf '%s' "$FAKE_DOMAIN" | od -A n -t x1 | tr -d ' \n'); do
-    FAKE_DOMAIN_HEX="${FAKE_DOMAIN_HEX}${i}"
-  done
+  FAKE_DOMAIN_HEX=$(printf '%s' "$FAKE_DOMAIN" | hexdump -e '16/1 "%02x"' | tr -d ' ')
   SECRET_FAKE_FULL="ee${SECRET_FAKE}${FAKE_DOMAIN_HEX}"
   PORT_FAKE="2443"
   WAN_IP="$(curl -s --max-time 5 ifconfig.me 2>/dev/null)"
-  
   if [ -f "$BIN_PATH_RS" ]; then
     echo -e "${CYAN}Останавливаем старый сервис...${NC}"
     pkill -9 tg-ws-proxy-rs 2>/dev/null
@@ -638,36 +631,30 @@ install_TG_RS_FAKETLS() {
     /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1
     sleep 2
   fi
-  
   echo -e "${CYAN}Скачиваем tg-ws-proxy-rs${NC}"
   LATEST_TAG_RS="v1.4.1"
   DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
   wget -q -O "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
-  
-  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE_FULL" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
-  
+  printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE" "$FAKE_DOMAIN" > /etc/init.d/tg-ws-proxy-rs
   chmod +x "$INIT_PATH_RS"
   /etc/init.d/tg-ws-proxy-rs enable
   /etc/init.d/tg-ws-proxy-rs start
-  
   sleep 3
-  
   if ! pidof tg-ws-proxy-rs >/dev/null 2>&1; then
     echo -e "${RED}Сервис не запущен, пробуем вручную...${NC}"
     /usr/bin/tg-ws-proxy-rs --help 2>&1 | head -5 || echo "Ошибка бинарника"
-    /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret "$SECRET_FAKE_FULL" --listen-faketls-domain "$FAKE_DOMAIN" &
+    /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port 2443 --secret "$SECRET_FAKE" --listen-faketls-domain "$FAKE_DOMAIN" &
     sleep 3
   fi
-  
   if pidof tg-ws-proxy-rs >/dev/null 2>&1; then
     echo -e "${GREEN}Сервис ${NC}TG WS Proxy Rust${GREEN} запущен!${NC}\n"
     echo -e "${YELLOW}Настройки:${NC}"
     echo -e "${YELLOW}Тип прокси:${NC} MTProto (Faketls)"
-    echo -e "${YELLOW}Хост:${NC} $LAN_IP"
+    echo -e "${YELLOW}Хост:${NC} $WAN_IP"
     echo -e "${YELLOW}Порт:${NC} $PORT_FAKE"
-echo -e "${YELLOW}Ключ:${NC} $SECRET_FAKE_FULL"
+    echo -e "${YELLOW}Ключ:${NC} $SECRET_FAKE_FULL"
     echo -e "${YELLOW}Ссылка для подключения:${NC}"
     echo "tg://proxy?server=$WAN_IP&port=$PORT_FAKE&secret=$SECRET_FAKE_FULL"
   else
@@ -680,14 +667,14 @@ ext_access_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then e
 WAN_IP="$(curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "не определён")"; if [ -z "$WAN_IP" ] || [ "$WAN_IP" = "не определён" ]; then WAN_IP="узнай на ifconfig.me"; fi
 FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_CHECK" ]; then
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32,\}\).*/\1/p' "$INIT_PATH_RS")"
+  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 else
   SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 fi; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"
 FAKETLS_DOMAIN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
-if [ -n "$FAKETLS_DOMAIN_RS" ]; then PREFIX="ee"; PROXY_TYPE="Faketls ($FAKETLS_DOMAIN_RS)"; else PREFIX="dd"; PROXY_TYPE="MTProto"; fi
+if [ -n "$FAKETLS_DOMAIN_RS" ]; then PREFIX="ee"; PROXY_TYPE="Faketls ($FAKETLS_DOMAIN_RS)"; FAKE_DOMAIN_HEX=$(printf '%s' "$FAKETLS_DOMAIN_RS" | hexdump -e '16/1 "%02x"' | tr -d ' '); SECRET_LINK="ee${SECRET_IN_RS}${FAKE_DOMAIN_HEX}"; else PREFIX="dd"; PROXY_TYPE="MTProto"; SECRET_LINK="dd${SECRET_IN_RS}"; fi
 echo -e "\n${YELLOW}Текущий хост:${NC} 0.0.0.0 (все интерфейсы)"; echo -e "${YELLOW}Тип прокси:${NC} $PROXY_TYPE"; echo -e "${YELLOW}Порт:${NC} $PORT_IN_RS"; echo -e "${YELLOW}Белый IP:${NC} $WAN_IP"
-echo -e "\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$WAN_IP&port=$PORT_IN_RS&secret=$PREFIX$SECRET_IN_RS"
+echo -e "\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$WAN_IP&port=$PORT_IN_RS&secret=$SECRET_LINK"
 echo -e "\n${YELLOW}Открыть порт в фаерволе?${NC}"; echo -ne "  [y/N]: "; read ANSWER; if [ "$ANSWER" = "y" ] || [ "$ANSWER" = "Y" ]; then
 if ! uci show firewall 2>/dev/null | grep -q "Allow-TG-Proxy"; then uci add firewall rule; uci set firewall.@rule[-1].name='Allow-TG-Proxy'; uci set firewall.@rule[-1].src='wan'; uci set firewall.@rule[-1].dest_port="$PORT_IN_RS"; uci set firewall.@rule[-1].proto='tcp'; uci set firewall.@rule[-1].target='ACCEPT'; uci commit firewall; /etc/init.d/firewall restart; echo -e "${GREEN}Порт $PORT_IN_RS открыт!${NC}"; else echo -e "${YELLOW}Порт уже открыт!${NC}"; fi; fi
 echo -e "\n${GREEN}Перезапустить прокси с внешним доступом?${NC}"; echo -ne "  [y/N]: "; read ANSWER2; if [ "$ANSWER2" = "y" ] || [ "$ANSWER2" = "Y" ]; then /etc/init.d/tg-ws-proxy-rs restart; sleep 1; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}Прокси ${NC}$PROXY_TYPE${GREEN} запущен и доступен извне!${NC}"; else echo -e "${RED}Ошибка запуска!${NC}"; fi; fi; PAUSE; }
@@ -717,11 +704,12 @@ if [ -n "$INSTALLED_VER_GO" ]; then if [ "$GO_ACTION" = "update" ]; then echo -e
 if pidof tg-ws-proxy-go >/dev/null 2>&1 && [ -f "$BIN_PATH_GO" ] && [ -f "$INIT_PATH_GO" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Go SOCKS5${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} SOCKS5\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 1080${NC}\n${YELLOW}Ссылка для подключения:${NC}\ntg://socks?server=$LAN_IP&port=1080"; fi
 if pgrep -f tg-ws-proxy-rs >/dev/null 2>&1 && [ -f "$BIN_PATH_RS" ] && [ -f "$INIT_PATH_RS" ]; then FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_CHECK" ]; then
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32,\}\).*/\1/p' "$INIT_PATH_RS")"
+  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 else
   SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
 fi; FAKETLS_IN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
-if [ -n "$FAKETLS_IN_RS" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust (Faketls)${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto (Faketls)\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} ee$SECRET_IN_RS\n${YELLOW}SNI домен:${NC} $FAKETLS_IN_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=ee$SECRET_IN_RS"; else echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} dd$SECRET_IN_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=dd$SECRET_IN_RS"; fi; fi
+if [ -n "$FAKETLS_IN_RS" ]; then FAKE_DOMAIN_HEX=$(printf '%s' "$FAKETLS_IN_RS" | hexdump -e '16/1 "%02x"' | tr -d ' '); SECRET_LINK_RS="ee${SECRET_IN_RS}${FAKE_DOMAIN_HEX}"; else SECRET_LINK_RS="dd${SECRET_IN_RS}"; fi
+if [ -n "$FAKETLS_IN_RS" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust (Faketls)${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto (Faketls)\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} $SECRET_LINK_RS\n${YELLOW}SNI домен:${NC} $FAKETLS_IN_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=$SECRET_LINK_RS"; else echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} $SECRET_LINK_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=$SECRET_LINK_RS"; fi; fi
 if pidof tg-ws-proxy >/dev/null 2>&1 && [ -f "/etc/init.d/tg-ws-proxy" ]; then SECRET_CONF="$(grep '^SECRET=' $SECRET_FILE 2>/dev/null | cut -d'=' -f2)"; echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Go MTProto${YELLOW}:${NC}"; echo -e "${YELLOW}Тип прокси:${NC} MTProto"
 echo -e "${YELLOW}Хост:${NC} $LAN_IP"; echo -e "${YELLOW}Порт:${NC} 1443"; echo -e "${YELLOW}Ключ:${NC} dd$SECRET_CONF"; echo -e "${YELLOW}Ссылка для подключения:${NC}"; echo -e "tg://proxy?server=$LAN_IP&port=1443&secret=dd$SECRET_CONF"; fi
 echo -e "\n${CYAN}1)${GREEN} $( [ -f "$BIN_PATH_GO" ] && [ -f "$INIT_PATH_GO" ] && echo -e "Удалить ${NC}TG WS Proxy Go SOCKS5" || echo "Установить ${NC}TG WS Proxy Go SOCKS5" )"
