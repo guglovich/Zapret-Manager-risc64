@@ -5,7 +5,7 @@
 ZAPRET_MANAGER_VERSION="9.81-risc64"; STR_VERSION_AUTOINSTALL="v7"
 
 ZAPRET_VERSION="72.20260307"; PODKOP_LATEST_VER="0.9.6"; TG_MTProto="0.9.3"; MT_VERSION="0.8.2"
-SPL_VER="26.8.1.3"; TG_GO_VERSION="1.4.1"; TG_RS_VERSION="2.2.1"; BYEDPI_LATEST_VER="0.17.3"
+SPL_VER="26.8.1.3"; TG_GO_VERSION="1.4.1"; TG_RS_VERSION="2.2.1"; TG_RS_RISC64_VERSION="2.0.0"; BYEDPI_LATEST_VER="0.17.3"
 
 OWRTAWG=$(grep '^DISTRIB_RELEASE=' /etc/openwrt_release | cut -d"'" -f2); ARCHAWG="$(grep DISTRIB_ARCH /etc/openwrt_release | cut -d"'" -f2)_$(grep DISTRIB_TARGET /etc/openwrt_release | cut -d"'" -f2 | tr '/' '_')" 
 CRON_CMD="/etc/init.d/mihomo restart"; CONFIGPATH="/etc/magitrickle/state/config.yaml"; PACKAGES_UPDATED=0
@@ -110,15 +110,15 @@ if [ -z "$VERSION" ]; then echo -e "$NAME - ${RED}не удалось извле
 
 clear; echo -e "${CYAN}Cобираем версии:${NC}"
 TMP_VER="/tmp/zapret_version"; TMP_VER_POD="/tmp/podkop_version"; TMP_VER_TG_MT="/tmp/tg_ws_proxy_MTp_ver"; TMP_VER_TG_GO="/tmp/tg_ws_proxy_GO_ver"
-TMP_VER_TG_RS="/tmp/tg_ws_proxy_RS_ver"; TMP_MAG_VER="/tmp/MagiTrickle_version"; TMP_VER_SPL="/tmp/splify_version"; TMP_VER_BYEDPI="/tmp/byedpi_version"
+TMP_VER_TG_RS="/tmp/tg_ws_proxy_RS_ver"; TMP_VER_TG_RS64="/tmp/tg_ws_proxy_RS64_ver"; TMP_MAG_VER="/tmp/MagiTrickle_version"; TMP_VER_SPL="/tmp/splify_version"; TMP_VER_BYEDPI="/tmp/byedpi_version"
 # get_ver "https://github.com/MagiTrickle/MagiTrickle/releases/latest" "$TMP_MAG_VER" "MagiTrickle" &
 # get_ver "https://github.com/spatiumstas/tg-ws-proxy-go/releases/latest" "$TMP_VER_TG_MT" "TG-WS Proxy MTProto" &
 get_ver "https://github.com/DPITrickster/ByeDPI-OpenWrt/releases/latest" "$TMP_VER_BYEDPI" "ByeDPI" & get_ver "https://github.com/yandexru45/netshift/releases/latest" "$TMP_VER_POD" "NetShift" &
 get_ver "https://github.com/remittor/zapret-openwrt/releases/latest" "$TMP_VER" "Zapret" & get_ver "https://github.com/xyzmean/splify/releases/latest" "$TMP_VER_SPL" "splify" &
-get_ver "https://github.com/d0mhate/-tg-ws-proxy-Manager-go/releases/latest" "$TMP_VER_TG_GO" "TG-WS Proxy SOCKS5" & get_ver "https://github.com/valnesfjord/tg-ws-proxy-rs/releases/latest" "$TMP_VER_TG_RS" "TG-WS Proxy Rust" & wait
+get_ver "https://github.com/d0mhate/-tg-ws-proxy-Manager-go/releases/latest" "$TMP_VER_TG_GO" "TG-WS Proxy SOCKS5" & get_ver "https://github.com/valnesfjord/tg-ws-proxy-rs/releases/latest" "$TMP_VER_TG_RS" "TG-WS Proxy Rust" & get_ver "https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/latest" "$TMP_VER_TG_RS64" "TG-WS Proxy Rust RISC64" & wait
 [ -s "$TMP_MAG_VER" ] && MT_VERSION="$(cat "$TMP_MAG_VER")"; [ -s "$TMP_VER_BYEDPI" ] && BYEDPI_LATEST_VER="$(cat "$TMP_VER_BYEDPI" | sed 's/^v//' | cut -d'-' -f1)"
 [ -s "$TMP_VER" ] && ZAPRET_VERSION="$(cat "$TMP_VER")"; [ -s "$TMP_VER_POD" ] && PODKOP_LATEST_VER="$(cat "$TMP_VER_POD")"; [ -s "$TMP_VER_TG_MT" ] && TG_MTProto="$(cat "$TMP_VER_TG_MT")"
-[ -s "$TMP_VER_SPL" ] && SPL_VER="$(cat "$TMP_VER_SPL")"; [ -s "$TMP_VER_TG_GO" ] && TG_GO_VERSION="$(cat "$TMP_VER_TG_GO")"; [ -s "$TMP_VER_TG_RS" ] && TG_RS_VERSION="$(cat "$TMP_VER_TG_RS")"
+[ -s "$TMP_VER_SPL" ] && SPL_VER="$(cat "$TMP_VER_SPL")"; [ -s "$TMP_VER_TG_GO" ] && TG_GO_VERSION="$(cat "$TMP_VER_TG_GO")"; [ -s "$TMP_VER_TG_RS" ] && TG_RS_VERSION="$(cat "$TMP_VER_TG_RS")"; [ -s "$TMP_VER_TG_RS64" ] && TG_RS_RISC64_VERSION="$(cat "$TMP_VER_TG_RS64")"
 
 echo 'sh <(wget -q -O - https://raw.githubusercontent.com/StressOzz/Zapret-Manager/main/Zapret-Manager.sh)' > /usr/bin/zms; chmod +x /usr/bin/zms
 echo 'sh <(wget -q -O - https://raw.githubusercontent.com/StressOzz/Zapret-Manager/main/Zapret-Manager.sh) "$@"' > /usr/bin/zmsA; chmod +x /usr/bin/zmsA
@@ -784,9 +784,10 @@ echo -en "\n${YELLOW}Выберите зеркало: ${NC}"; read -r z; case "$
 get_arch_RS() { case "$ARCH" in riscv64*|riscv*) echo "tg-ws-proxy" ;; aarch64*) echo "tg-ws-proxy-aarch64-unknown-linux-musl" ;; x86_64) echo "tg-ws-proxy-x86_64-unknown-linux-musl" ;; arm*) echo "tg-ws-proxy-armv7-unknown-linux-musleabihf" ;; mipsel*) echo "tg-ws-proxy-mipsel-unknown-linux-musl" ;; mips*) echo "tg-ws-proxy-mips-unknown-linux-musl" ;; *) echo -e "\n${RED}Архитектура не поддерживается: ${NC}$ARCH\n"; PAUSE; return 1 ;; esac; }
 delete_TG_RS() { echo -e "\n${MAGENTA}Удаляем TG WS Proxy Rust${NC}"; /etc/init.d/tg-ws-proxy-rs stop >/dev/null 2>&1; /etc/init.d/tg-ws-proxy-rs disable >/dev/null 2>&1; rm -f "$BIN_PATH_RS" "$INIT_PATH_RS" "$BIN_VER_RS"; echo -e "TG WS Proxy Rust ${GREEN}удалён!${NC}\n"; PAUSE; }
 install_TG_RS() { echo -e "\n${MAGENTA}Устанавливаем TG WS Proxy Rust${NC}"; ARCH_FILE_RS="$(get_arch_RS)" || return 1; echo -e "${CYAN}Скачиваем и устанавливаем${NC} $ARCH_FILE_RS"; if [ "$ARCH_FILE_RS" = "tg-ws-proxy" ]; then
-DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/v1.4.1/tg-ws-proxy"
+LATEST_TAG_RS="v${TG_RS_RISC64_VERSION}"
+DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
 wget -q -O "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }; chmod +x /tmp/tg-ws-proxy-new; mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
-echo "v1.4.1" > "$BIN_VER_RS"; else DOWNLOAD_URL_RS="https://github.com/valnesfjord/tg-ws-proxy-rs/releases/download/v${TG_RS_VERSION}/${ARCH_FILE_RS}.tar.gz"
+echo "$TG_RS_RISC64_VERSION" > "$BIN_VER_RS"; else DOWNLOAD_URL_RS="https://github.com/valnesfjord/tg-ws-proxy-rs/releases/download/v${TG_RS_VERSION}/${ARCH_FILE_RS}.tar.gz"
 curl -L --fail -o "$TMP_ARCHIVE_RS" "$DOWNLOAD_URL_RS" >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }; rm -rf "$TMP_DIR_RS"; mkdir -p "$TMP_DIR_RS"; tar -xzf "$TMP_ARCHIVE_RS" -C "$TMP_DIR_RS" || { echo -e "\n${RED}Ошибка распаковки${NC}\n"
 rm -f "$TMP_ARCHIVE_RS"; PAUSE; return 1; }; rm -f "$BIN_PATH_RS"; mv "$TMP_DIR_RS"/tg-ws-proxy* "$BIN_PATH_RS" || { echo -e "\n${RED}Ошибка установки бинарника${NC}\n"; rm -rf "$TMP_DIR_RS" "$TMP_ARCHIVE_RS"; PAUSE; return 1; }
 chmod +x "$BIN_PATH_RS"; rm -rf "$TMP_DIR_RS" "$TMP_ARCHIVE_RS"; echo "$TG_RS_VERSION" > "$BIN_VER_RS"; fi; if [ ! -f "$INIT_PATH_RS" ]; then
@@ -798,12 +799,12 @@ echo -e "${CYAN}Останавливаем сервис...${NC}"; pkill -9 tg-ws
 echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; [ -z "$SECRET_IN_RS" ] && SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if ! command -v curl >/dev/null 2>&1; then echo -e "${CYAN}Устанавливаем ${NC}curl"; $UPDATE >/dev/null 2>&1 && $INSTALL curl >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка установки curl${NC}\n"; PAUSE; return 1; }; fi
-echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v1.4.1"
+echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v${TG_RS_RISC64_VERSION}"
 DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
 curl -L --connect-timeout 10 --max-time 60 -o "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
-chmod +x /tmp/tg-ws-proxy-new; mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"; echo "v1.4.1" > "$BIN_VER_RS"
+chmod +x /tmp/tg-ws-proxy-new; mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"; echo "$TG_RS_RISC64_VERSION" > "$BIN_VER_RS"
 echo -e "${CYAN}Восстанавливаем настройки...${NC}"; if [ -n "$FAKETLS_DOMAIN" ]; then printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" "$FAKETLS_DOMAIN" > "$INIT_PATH_RS"; else printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --default-domains --cf-balance --cf-priority\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_IN_RS" "$SECRET_IN_RS" > "$INIT_PATH_RS"; fi
-chmod +x "$INIT_PATH_RS"; "$INIT_PATH_RS" restart; sleep 1; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}TG WS Proxy Rust обновлён!${NC}\n"; else echo -e "\n${RED}Ошибка запуска!${NC}\n"; fi; PAUSE; }
+chmod +x "$INIT_PATH_RS"; "$INIT_PATH_RS" enable >/dev/null 2>&1; "$INIT_PATH_RS" stop >/dev/null 2>&1; sleep 1; "$INIT_PATH_RS" start; sleep 1; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then echo -e "${GREEN}TG WS Proxy Rust обновлён!${NC}\n"; else echo -e "\n${RED}Ошибка запуска!${NC}\n"; fi; PAUSE; }
 # УСТАНОВКА RUST С FAKETLS DOMAIN
 install_TG_RS_FAKETLS() {
   echo -e "\n${MAGENTA}Установка TG WS Proxy Rust с Faketls Domain${NC}"
@@ -823,12 +824,12 @@ install_TG_RS_FAKETLS() {
     sleep 2
   fi
   echo -e "${CYAN}Скачиваем tg-ws-proxy-rs${NC}"
-  LATEST_TAG_RS="v1.4.1"
+  LATEST_TAG_RS="v${TG_RS_RISC64_VERSION}"
   DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
   wget -q -O "/tmp/tg-ws-proxy-new" "$DOWNLOAD_URL_RS" || { echo -e "\n${RED}Ошибка скачивания${NC}\n"; PAUSE; return 1; }
   chmod +x /tmp/tg-ws-proxy-new
   mv -f /tmp/tg-ws-proxy-new "$BIN_PATH_RS"
-  echo "v1.4.1" > "$BIN_VER_RS"
+  echo "$TG_RS_RISC64_VERSION" > "$BIN_VER_RS"
   printf '#!/bin/sh /etc/rc.common\nSTART=99\nUSE_PROCD=1\n\nstart_service() {\n    procd_open_instance\n    procd_set_param command /usr/bin/tg-ws-proxy-rs --host 0.0.0.0 --port %s --secret %s --listen-faketls-domain %s\n    procd_set_param respawn\n    procd_close_instance\n}\n' "$PORT_FAKE" "$SECRET_FAKE" "$FAKE_DOMAIN" > "$INIT_PATH_RS"
   chmod +x "$INIT_PATH_RS"
   "$INIT_PATH_RS" enable
@@ -885,7 +886,7 @@ remove_TG_PKG() { echo -e "\n${MAGENTA}Удаляем TG WS Proxy MTProto${NC}";
 # МЕНЮ
 menu_TG() { while true; do SECRET="$(head -c16 /dev/urandom | hexdump -e '16/1 "%02x"')"; get_TG_versions; if command -v opkg >/dev/null 2>&1; then INSTALLED_VER_MT="$(opkg list-installed 2>/dev/null | grep '^tg-ws-proxy' | awk '{print $3}' | cut -d'-' -f1)"; else INSTALLED_VER_MT="$(apk list -I 2>/dev/null | grep '^tg-ws-proxy-' | sed -E 's/tg-ws-proxy-([0-9.]+).*/\1/')"; fi
 if [ -z "$INSTALLED_VER_MT" ]; then MT_ACTION="install"; elif [ "$INSTALLED_VER_MT" != "$TG_MTProto" ]; then MT_ACTION="update"; else MT_ACTION="installed"; fi; if [ -f "$BIN_PATH_GO" ] && [ -f "$INIT_PATH_GO" ]; then if [ -n "$INSTALLED_VER_GO" ] && [ "$INSTALLED_VER_GO" = "$TG_GO_VERSION" ]; then GO_ACTION="installed"; else GO_ACTION="update"; fi; else GO_ACTION="install"; fi
-if [ -f "$BIN_PATH_RS" ] && [ -f "$INIT_PATH_RS" ]; then if [ -n "$INSTALLED_VER_RS" ] && [ "$INSTALLED_VER_RS" = "$TG_RS_VERSION" ]; then RS_ACTION="installed"; else RS_ACTION="update"; fi; else RS_ACTION="install"; fi; clear; echo -e "${MAGENTA}Меню TG WS Proxy${NC}\n"; TGSTATUS=""; pidof tg-ws-proxy-go >/dev/null 2>&1 && TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}SOCKS5${GREEN}"
+if [ -f "$BIN_PATH_RS" ] && [ -f "$INIT_PATH_RS" ]; then RS_LATEST="$TG_RS_VERSION"; case "$ARCH" in riscv64*|riscv*) RS_LATEST="$TG_RS_RISC64_VERSION" ;; esac; if [ -n "$INSTALLED_VER_RS" ] && [ "$INSTALLED_VER_RS" = "$RS_LATEST" ]; then RS_ACTION="installed"; else RS_ACTION="update"; fi; else RS_ACTION="install"; fi; clear; echo -e "${MAGENTA}Меню TG WS Proxy${NC}\n"; TGSTATUS=""; pidof tg-ws-proxy-go >/dev/null 2>&1 && TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}SOCKS5${GREEN}"
 pidof tg-ws-proxy >/dev/null 2>&1 && TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}MTProto${GREEN}"; pidof tg-ws-proxy-rs >/dev/null 2>&1 && TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}Rust${GREEN}"; if [ -n "$TGSTATUS" ]; then echo -e "${YELLOW}TG WS Proxy:${NC} ${GREEN}запущен [${TGSTATUS}]${NC}"; else echo -e "${YELLOW}TG WS Proxy:${NC} ${RED}не установлен${NC}"; fi
 if [ -n "$INSTALLED_VER_MT" ]; then if [ "$MT_ACTION" = "update" ]; then echo -e "${YELLOW}TG WS Proxy MTProto версия:${NC} ${RED}$INSTALLED_VER_MT (версия устарела)${NC}"; else echo -e "${YELLOW}TG WS Proxy MTProto версия:${NC} ${GREEN}$INSTALLED_VER_MT${NC}"; fi; fi; if [ -n "$INSTALLED_VER_GO" ]; then if [ "$GO_ACTION" = "update" ]
 then echo -e "${YELLOW}TG WS Proxy SOCKS5 версия:${NC} ${RED}$INSTALLED_VER_GO (версия устарела)${NC}"; else echo -e "${YELLOW}TG WS Proxy SOCKS5 версия:${NC} ${GREEN}$INSTALLED_VER_GO${NC}"; fi; fi; if [ -n "$INSTALLED_VER_RS" ]; then if [ "$RS_ACTION" = "update" ]; then echo -e "${YELLOW}TG WS Proxy Rust версия:${NC} ${RED}$INSTALLED_VER_RS (версия устарела)${NC}"
@@ -1008,7 +1009,7 @@ SPL_V_VER; [ -n "$SPL_INST_VER" ] && { [ "$SPL_VER" = "$SPL_INST_VER" ] && echo 
 case "$(/etc/init.d/mihomo status 2>/dev/null)" in running) echo -e "${YELLOW}Mixomo:              ${GREEN}запущен${NC}" ;; inactive) echo -e "${YELLOW}Mixomo:              ${RED}остановлен${NC}" ;; esac
 get_TG_versions; TGSTATUS=""; if pidof tg-ws-proxy-go >/dev/null 2>&1; then if [ -n "$INSTALLED_VER_GO" ] && [ -n "$TG_GO_VERSION" ] && [ "$INSTALLED_VER_GO" != "$TG_GO_VERSION" ]; then TGSTATUS="${TGSTATUS:+$TGSTATUS/}${RED}SOCKS5 NEW${GREEN}"
 else TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}SOCKS5${GREEN}"; fi; fi; if pidof tg-ws-proxy >/dev/null 2>&1; then if [ -n "$INSTALLED_VER_MT" ] && [ -n "$TG_MTProto" ] && [ "$INSTALLED_VER_MT" != "$TG_MTProto" ]; then TGSTATUS="${TGSTATUS:+$TGSTATUS/}${RED}MTProto NEW${GREEN}"
-else TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}MTProto${GREEN}"; fi; fi; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then if [ -n "$INSTALLED_VER_RS" ] && [ -n "$TG_RS_VERSION" ] && [ "$INSTALLED_VER_RS" != "$TG_RS_VERSION" ]; then TGSTATUS="${TGSTATUS:+$TGSTATUS/}${RED}Rust NEW${GREEN}"
+else TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}MTProto${GREEN}"; fi; fi; if pidof tg-ws-proxy-rs >/dev/null 2>&1; then RS_LATEST="$TG_RS_VERSION"; case "$ARCH" in riscv64*|riscv*) RS_LATEST="$TG_RS_RISC64_VERSION" ;; esac; if [ -n "$INSTALLED_VER_RS" ] && [ -n "$RS_LATEST" ] && [ "$INSTALLED_VER_RS" != "$RS_LATEST" ]; then TGSTATUS="${TGSTATUS:+$TGSTATUS/}${RED}Rust NEW${GREEN}"
 else TGSTATUS="${TGSTATUS:+$TGSTATUS/}${NC}Rust${GREEN}"; fi; fi; if [ -n "$TGSTATUS" ]; then echo -e "${YELLOW}TG WS Proxy:${NC}         ${GREEN}запущен [${TGSTATUS}]${NC}"; fi
 if hosts_enabled; then echo -e "${YELLOW}Домены в hosts:      ${GREEN}$hosts_echo${NC}"; fi; [ -f "$DATE_FILE" ] && echo -e "${YELLOW}Резервная копия:${NC}     ${GREEN}сохранена"; show_script_50 && [ -n "$name" ] && echo -e "${YELLOW}Установлен скрипт:${NC}   $name"; grep -q "$Fin_IP_Dis" /etc/hosts && echo -e "${YELLOW}IP для Discord:      ${GREEN}включены${NC}"
 if [ -n "$DOH_STATUS" ]; then if [ "$PKG_IS_APK" -eq 1 ]; then apk info -e https-dns-proxy >/dev/null 2>&1 && echo -e "${YELLOW}DNS over HTTPS:${NC}      ${GREEN}$DOH_STATUS${NC}"; else opkg list-installed | grep -q '^https-dns-proxy ' && echo -e "${YELLOW}DNS over HTTPS:${NC}      ${GREEN}$DOH_STATUS${NC}"; fi; fi
