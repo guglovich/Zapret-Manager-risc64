@@ -796,11 +796,7 @@ chmod +x "$INIT_PATH_RS"; "$INIT_PATH_RS" enable >/dev/null 2>&1; fi; "$INIT_PAT
 update_TG_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Обновление TG WS Proxy Rust${NC}"
 echo -e "${CYAN}Останавливаем сервис...${NC}"; pkill -9 tg-ws-proxy-rs 2>/dev/null; sleep 2; "$INIT_PATH_RS" stop >/dev/null 2>&1; sleep 2
 echo -e "${CYAN}Сохраняем текущие настройки...${NC}"; FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
-if [ -n "$FAKETLS_CHECK" ]; then
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
-else
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
-fi; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
+ SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; [ -z "$SECRET_IN_RS" ] && SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"; FAKETLS_DOMAIN="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if ! command -v curl >/dev/null 2>&1; then echo -e "${CYAN}Устанавливаем ${NC}curl"; $UPDATE >/dev/null 2>&1 && $INSTALL curl >/dev/null 2>&1 || { echo -e "\n${RED}Ошибка установки curl${NC}\n"; PAUSE; return 1; }; fi
 echo -e "${CYAN}Скачиваем новую версию${NC}"; LATEST_TAG_RS="v1.4.1"
 DOWNLOAD_URL_RS="https://github.com/guglovich/tg-ws-proxy-rs-risc64/releases/download/$LATEST_TAG_RS/tg-ws-proxy"
@@ -862,11 +858,7 @@ install_TG_RS_FAKETLS() {
 ext_access_RS() { if [ ! -f "$BIN_PATH_RS" ] || [ ! -f "$INIT_PATH_RS" ]; then echo -e "\n${RED}TG WS Proxy Rust не установлен!${NC}\n"; PAUSE; return; fi; echo -e "\n${MAGENTA}Настройка внешнего доступа TG WS Proxy Rust${NC}"
 WAN_IP="$(curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "не определён")"; if [ -z "$WAN_IP" ] || [ "$WAN_IP" = "не определён" ]; then WAN_IP="узнай на ifconfig.me"; fi
 FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
-if [ -n "$FAKETLS_CHECK" ]; then
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
-else
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
-fi; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"
+SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; [ -z "$SECRET_IN_RS" ] && SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="$(sed -n 's/.*--port[[:space:]]*\([0-9]\+\).*/\1/p' "$INIT_PATH_RS")"; PORT_IN_RS="${PORT_IN_RS:-2443}"
 FAKETLS_DOMAIN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_DOMAIN_RS" ]; then PREFIX="ee"; PROXY_TYPE="Faketls ($FAKETLS_DOMAIN_RS)"; FAKE_DOMAIN_HEX=$(printf '%s' "$FAKETLS_DOMAIN_RS" | hexdump -e '16/1 "%02x"' | tr -d ' '); SECRET_LINK="ee${SECRET_IN_RS}${FAKE_DOMAIN_HEX}"; else PREFIX="dd"; PROXY_TYPE="MTProto"; SECRET_LINK="dd${SECRET_IN_RS}"; fi
 echo -e "\n${YELLOW}Текущий хост:${NC} 0.0.0.0 (все интерфейсы)"; echo -e "${YELLOW}Тип прокси:${NC} $PROXY_TYPE"; echo -e "${YELLOW}Порт:${NC} $PORT_IN_RS"; echo -e "${YELLOW}Белый IP:${NC} $WAN_IP"
@@ -899,11 +891,7 @@ if [ -n "$INSTALLED_VER_MT" ]; then if [ "$MT_ACTION" = "update" ]; then echo -e
 then echo -e "${YELLOW}TG WS Proxy SOCKS5 версия:${NC} ${RED}$INSTALLED_VER_GO (версия устарела)${NC}"; else echo -e "${YELLOW}TG WS Proxy SOCKS5 версия:${NC} ${GREEN}$INSTALLED_VER_GO${NC}"; fi; fi; if [ -n "$INSTALLED_VER_RS" ]; then if [ "$RS_ACTION" = "update" ]; then echo -e "${YELLOW}TG WS Proxy Rust версия:${NC} ${RED}$INSTALLED_VER_RS (версия устарела)${NC}"
 else echo -e "${YELLOW}TG WS Proxy Rust версия:${NC} ${GREEN}$INSTALLED_VER_RS${NC}"; fi; fi; if pidof tg-ws-proxy-go >/dev/null 2>&1 && [ -f "$BIN_PATH_GO" ] && [ -f "$INIT_PATH_GO" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy SOCKS5${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} SOCKS5\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2080"
 echo -e "${YELLOW}Ссылка для подключения:${NC}"; echo -e "tg://socks?server=$LAN_IP&port=2080"; fi; if pgrep -f tg-ws-proxy-rs >/dev/null 2>&1 && [ -f "$BIN_PATH_RS" ] && [ -f "$INIT_PATH_RS" ]; then FAKETLS_CHECK="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
-if [ -n "$FAKETLS_CHECK" ]; then
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
-else
-  SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"
-fi; FAKETLS_IN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
+SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*ee\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; [ -z "$SECRET_IN_RS" ] && SECRET_IN_RS="$(sed -n 's/.*--secret[[:space:]]*\([0-9a-fA-F]\{32\}\).*/\1/p' "$INIT_PATH_RS")"; FAKETLS_IN_RS="$(sed -n 's/.*--listen-faketls-domain[[:space:]]*\([^[:space:]]*\).*/\1/p' "$INIT_PATH_RS")"
 if [ -n "$FAKETLS_IN_RS" ]; then FAKE_DOMAIN_HEX=$(printf '%s' "$FAKETLS_IN_RS" | hexdump -e '16/1 "%02x"' | tr -d ' '); SECRET_LINK_RS="ee${SECRET_IN_RS}${FAKE_DOMAIN_HEX}"; else SECRET_LINK_RS="dd${SECRET_IN_RS}"; fi
 if [ -n "$FAKETLS_IN_RS" ]; then echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust (Faketls)${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto (Faketls)\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} $SECRET_LINK_RS\n${YELLOW}SNI домен:${NC} $FAKETLS_IN_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=$SECRET_LINK_RS"; else echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy Rust${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 2443\n${YELLOW}Ключ:${NC} $SECRET_LINK_RS\n${YELLOW}Ссылка для подключения:${NC}\ntg://proxy?server=$LAN_IP&port=2443&secret=$SECRET_LINK_RS"; fi; fi; if pidof tg-ws-proxy >/dev/null 2>&1 && [ -f "/etc/init.d/tg-ws-proxy" ]
 then SECRET_CONF="$(grep '^SECRET=' "$SECRET_FILE" 2>/dev/null | cut -d'=' -f2)"; echo -e "\n${YELLOW}Настройки ${CYAN}TG WS Proxy MTProto${YELLOW}:${NC}\n${YELLOW}Тип прокси:${NC} MTProto\n${YELLOW}Хост:${NC} $LAN_IP\n${YELLOW}Порт:${NC} 1443\n${YELLOW}Ключ:${NC} dd$SECRET_CONF"
