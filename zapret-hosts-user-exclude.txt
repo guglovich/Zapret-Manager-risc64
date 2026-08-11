@@ -1,32 +1,67 @@
 ru
+by
 рф
 su
 xn--p1ai
+xn--p1acf
+xn--80aswg
+xn--d1acj3b
+xn--80adxhks
 xn--80asehdb
 #################################### Разное
 hf.co
+box.ca
+2ip.io
+msi.com
 qwen.ai
 iiko.it
 okko.tv
+ripe.net
+ktalk.ru
 avito.st
 habr.com
+vibio.tv
+ali.click
 nexon.com
+tenor.com
 boosty.to
 ottai.com
 ufanet.tv
+apple.com
+whatbox.ca
 trovo.live
 beeline.tv
 ubuntu.com
 xsolla.com
 ip-api.com
+yandex.com
 gstatic.com
 lichess.org
 premier.one
+teclast.com
+wws-gs2.com
+dropbox.com
+genesis.com
+carcade.com
+map-care.com
+gravatar.com
+battleye.com
+opencity.pro
 ipstream.one
 godville.net
 voidboost.cc
+voidboost.one
+hcaptcha.com
+kaspersky.com
+canonical.com
+mediafire.com
+vivoglobal.com
+feralhosting.com
 moondroplab.tech
 rockstargames.com
+docs.altlinux.org
+battleye.b-cdn.net
+download.nvidia.com
 supporter-files.nexus-cdn.com
 #################################### VK
 vk.cc
@@ -39,6 +74,7 @@ vk.team
 vkgo.app
 skbx.pro
 youla.io
+nyphy.io
 mycdn.me
 mradx.net
 vk-cdn.me
@@ -47,6 +83,7 @@ vk-cdn.net
 vk.company
 vklive.app
 vkuser.net
+vknext.net
 bizmrg.com
 userapi.com
 vk-apps.com
@@ -135,7 +172,9 @@ lede-project.org
 githubusercontent.com
 #################################### UbisoftConnect
 ubi.com
+uplay.com
 ubisoft.com
+rainbow6.com
 ubisoftconnect.com
 #################################### Aliexpress
 ae.com
@@ -168,7 +207,6 @@ twitch.a2z.com
 twitch-shadow.net
 twitchcdn-shadow.net
 #################################### Valorant
-qq.com
 pvp.net
 vivox.com
 sd-rtn.com
@@ -222,6 +260,7 @@ xiaomi.cn
 mipay.com
 youpin.cn
 zmifi.com
+70mai.com
 mi-idc.com
 mi-img.com
 mijia.tech
@@ -259,7 +298,6 @@ miot-spec.org
 miot-spec.com
 xiaomiwear.com
 xiaomimimo.com
-dreamehome.com
 xiaomiprint.com
 xiaomidns.com.cn
 xiaomiinc.com.cn
@@ -270,8 +308,6 @@ xiaoaiassist.com
 xiaomi-mijia.com
 xiaomifactory.com
 airstarfinance.net
-dreame-technology.cn
-dreame-technology.com
 #################################### Picooc
 picoocru.com
 picooc-g.com
@@ -295,21 +331,35 @@ huaweicloud-dns.cn
 huaweicloud-dns.com
 huaweicloud-dns.org
 #################################### Delta Force
+gtimg.com
 volces.com
 wetest.net
+tencent.com
+vasdgame.co
+onezapp.com
 intlgame.com
+vasdgame.com
+gcloudcs.com
 fleetlogd.com
 dgameglobal.com
 tdatamaster.com
+tencent-cloud.com
+singaporepaya.com
 playdeltaforce.com
 quovadisglobal.com
 jupiterlauncher.com
 anticheatexpert.com
 #################################### Microsoft
+sfx.ms
+msn.com
+1drv.ms
 live.com
 lync.com
+live.net
+xbox.com
 skype.com
 microsoft
+fabric.io
 msauth.net
 office.net
 office.com
@@ -318,11 +368,14 @@ mojang.com
 windows.net
 msftauth.net
 xboxlive.com
+onedrive.com
 microsoft.com
 office365.com
-azureedge.net
+sharepoint.com
 skypeassets.com
+xboxservices.com
 windowsupdate.com
+microsoft-tst.com
 microsoftonline.com
 microsoftonline-p.com
 minecraftservices.com
@@ -416,6 +469,7 @@ hiseese.com
 icloseli.com
 ucloudcam.com
 #################################### The Finals
+codefusion.technology
 ac-upd.codefusion.technology
 ac-trg.codefusion.technology
 ac-rep.codefusion.technology
@@ -442,4 +496,41 @@ playbattlegrounds.com
 #################################### Tumblr
 tmblr.com
 tumblr.com
+#################################### Postman
+postman.com
+getpostman.com
+postmanapp.com
+#################################### Radmin
+radmin.com
+famatech.com
+radmin-vpn.com
+#################################### DNS
+quad9.net
+joindns4.eu
+controld.com
+dns.comss.one
+dns.adguard-dns.com
+#################################### Black Desert Online
+wellbia.com
+bdocodex.com
+pearl-bdo.com
+pearlabyss.com
+playblackdesert.com
+#################################### bip.com
+bip.ai
+bip.com
+netmera-web.com
+#################################### kino.pub
+cdntogo.net
+cdn2cdn.com
+cdn2site.com
+nearcache.net
+staticpop.net
+digital-cdn.net
+#################################### Dreame
+dreame.tech
+dreametech.com
+dreamehome.com
+dreame-technology.cn
+dreame-technology.com
 ####################################

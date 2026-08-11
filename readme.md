@@ -1,16 +1,85 @@
-<h1 align="center"> Инструкция по настройке Zapret от remittor и Telegram при помощи Zapret Manager</h1>
+<h1 align="center">Универсальный менеджер для обхода блокировок на OpenWrt</h1>
+
+<div align="center">
+
+![Platform](https://img.shields.io/badge/Platform-OpenWrt-orange)
+![Architecture](https://img.shields.io/badge/Architecture-All%20(OpenWrt)-yellow)
+![Script](https://img.shields.io/badge/Script-sh-informational)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Community](https://img.shields.io/badge/Community-Enabled-green)
+[![Views](https://views.whatilearened.today/views/github/StressOzz/Zapret-Manager.svg)](https://github.com/StressOzz/Zapret-Manager)
+![GitHub last commit](https://img.shields.io/github/last-commit/StressOzz/Zapret-Manager)
+
+</div>
+
+---
+
+### **StressKVN** - умный VPN для стабильного доступа в любых условиях
+
+- ✅ Работает даже при жёсткой фильтрации и в условиях белых списков
+- 🌍 Умная маршрутизация: иностранные ресурсы через VPN, российский трафик напрямую
+- ▶️ YouTube без рекламы
+- ⚡ Высокая скорость и безлимитный трафик
+- 📶 Можно использовать прямо на роутере
+- 🎁 Бесплатный тест — 3 дня без оплаты
+
+Подробнее: **https://github.com/StressOzz/StressKVN**
+
+---
+
+### Для Windows - используйте: **https://github.com/StressOzz/ZapretOzz**
+
+---
 
 > [!IMPORTANT]
-> Данный способ **не гарантирует 100% работу** !!!
+> Если отсутствует доступ к **github.com**, выполните в **SSH** следующую команду:
+> ```
+> git="github.com"; grep -q "^140.82.114.3 $git" /etc/hosts || { printf "#$git\n140.82.114.3 $git\n185.199.110.154 github.githubassets.com\n185.199.110.133 camo.githubassets.com\n" >> /etc/hosts; /etc/init.d/dnsmasq restart 2>/dev/null; }; echo -e "\033[0;32mOK\033[0m"
+> ```
+
+Чтобы удалить эту настройку, в **SSH** выполните:
+```
+sed -i '/#github.com/,+3d' /etc/hosts; /etc/init.d/dnsmasq restart 2>/dev/null; echo -e "\033[0;32mOK\033[0m"
+```
+
+> [!IMPORTANT]
+> При возникновении проблем с запуском скрипта или его функций, выполните в **SSH** следующую команду:
+> ```
+> git="githubusercontent.com"; grep -q "raw.$git" /etc/hosts || { printf "#$git\n185.199.109.133 raw.$git release-assets.$git\n185.199.108.133 private-user-images.$git gist.$git avatars.$git\n" >> /etc/hosts; /etc/init.d/dnsmasq restart 2>/dev/null; }; echo -e "\033[0;32mOK\033[0m"
+> ```
+
+Чтобы удалить эту настройку, в **SSH** выполните:
+```
+sed -i '/#githubusercontent.com/,+2d' /etc/hosts; /etc/init.d/dnsmasq restart 2>/dev/null; echo -e "\033[0;32mOK\033[0m"
+```
+
+---
+
+<table>
+  <tr>
+    <td>
+      <a href="https://github.com/StressOzz#-поддержать-проект">
+        <img width="280" height="130" src="https://github.com/user-attachments/assets/2999757b-fbf3-4149-bf6c-48bf3e241529">
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/StressOzz/StressKVN">
+        <img width="280" height="130" alt="image" src="https://github.com/user-attachments/assets/519a126e-bd39-4f46-8a09-3f0d6e1dd8af">
+      </a>
+    </td>
+  </tr>
+</table>
+
+---
 
 # Оглавление
 - [Возможности](#-возможности)
 - [Подготовка системы](#-подготовка-системы)
 - [Запуск менеджера](#-запуск-менеджера)
-- [Быстрый старт и пункты меню](#-быстрый-старт)
-- [Настройка Telegram](#-настройка-telegram)
-- [Cтратегии для Youtube](#-стратегии-для-youtube)
-- [Cтратегии используемые в скрипте](#-стратегии-используемые-в-скрипте)
+- [Быстрый старт](#-быстрый-старт)
+- [Настройка Telegram](#-telegram)
+- [Cтратегии](#-стратегии)
+- [Mixomo](#-mixomo)
 - [Дерево меню Zapret Manager](#-дерево-меню-zapret-manager)
 - [Благодарности](#благодарности)
 - [Поддержать проект](https://github.com/StressOzz)
@@ -24,7 +93,7 @@
 - Установить **Zapret** последней версии
 - Выбрать стратегию для установки **v1-v9**
 - Выбрать и установить стратегию от **Flowseal**
-- Протестировать стратегии
+- Протестировать стратегии **v1-v9** и **Flowseal**
 - Подобрать стратегию для **YouTube**
 - Сделать резервную копию настроек **Zapret** 
 - Включить стратегию для игр **Battlefield 6**, **Apex Legend**, **Roblox** и других...
@@ -39,20 +108,32 @@
 - Разблокировать **Telegram WEB**, **rutor.info**, **ntc.party**, **lib.rus.ec**, **Instagram***
 - Разблокировать разрешение на **Twitch**
 - Сменить источник (выбрать зеркало) для пакетов **OpenWRT**
-- Установить **TG WS Proxy** для **Telegram**
+- Установить различные **TG WS Proxy** для **Telegram**
+- Установить **NetShift** - **https://github.com/yandexru45/netshift**
+- Установить **Mixomo** - **https://github.com/Internet-Helper/mixomo-openwrt**
+- Установить **splify** - **https://github.com/xyzmean/splify**
+- Интегрировать [**VPN подпиcку**](https://github.com/StressOzz/StressKVN) в **NetShift** и **Mixomo**
+- Сгенерировать **WARP** и интегрировать его в **Mixomo**
+- Запустить автоподбор стратегий по расписанию
 
 ---
 
 ## 🔹 Подготовка системы
 
 > [!IMPORTANT]
->для работы некотрых стратегий, в терминале Windows необходимо выполнить:
+>для работы некотрых стратегий, в терминале Windows необходимо один раз выполнить:
 >```
 >netsh int tcp set global timestamps=enabled
 >```
+>
+>для пользователей Linux:
+>```
+>sysctl -w net.ipv4.tcp_timestamps=1
+>```
 
-- Если у Вас установлен **ByeDPI** или **youtubeUnblock** скрипт выдаст сообщение
-- Если у Вас включён **Flow offloading** скрипт выдаст сообщение и в `Системном меню`, появится пункт **0** - **Применить FIX**
+- Если у Вас установлен **ByeDPI** или **youtubeUnblock** скрипт выдаст сообщение.
+- Если у Вас включён **Flow offloading** скрипт выдаст сообщение и в `Системном меню`, появится пункт **0** - **Применить FIX**.
+- [**NetShift** берёт на себя роль DNS-резолвера](https://podkop.net/docs/dns/), поэтому с установленным `DNS over HTTPS` [**NetShift не установится!**](https://podkop.net/docs/install/#nesovmestimost)
 
 ---
 
@@ -68,7 +149,7 @@ sh <(wget -O - https://raw.githubusercontent.com/StressOzz/Zapret-Manager/main/Z
 wget -O /tmp/Zapret-Manager.sh https://raw.githubusercontent.com/StressOzz/Zapret-Manager/main/Zapret-Manager.sh && sh /tmp/Zapret-Manager.sh
 ```
 
-После запуска скрипта по команде выше, в **SSH** скрипт можно запускать командой:
+После запуска скрипта по команде выше, скрипт можно запускать в **SSH** командой:
 ```
 zms
 ```
@@ -84,44 +165,28 @@ zms
 
 ## 🔹 Быстрый старт
 
-**Пункт 9** — **Удалить → установить → настроить Zapret**
+**Пункт f** - **Удалить → установить → настроить Zapret**
 
 Установка **Zapret** под ключ:
 - Удаляет Zapret
 - Устанавливает последнюю версию Zapret
-- Устанавливает стратегию **v1**
+- Устанавливает стратегию **v7**
 - Устанавливает скрипт **50-stun4all**
 - Добавляет в стратегию настройки для игр
 - Добавляет домены **Telegram WEB**, **AI**, **rutor.info**, **ntc.party**, **lib.rus.ec**, **Twitch**, **Instagram***  в `hosts`
 
 >⚠️ Использовать только для полной переустановки и настройки Zapret.
 
-## 🔹 Стратегии для Youtube
+## 🔹 Стратегии
 
 Если у Вас не запускается **Youtube** на каком-либо устройстве, то попробуйте подобрать стратегию только для **YouTube**.
 
-### В скрипте, в 4 пункте - Тестировать стратегии для `YouTube`
+В скрипте, в пункте 2, затем 0 - Тестировать стратегии для `YouTube` и Тестировать `v` и `Flowseal` стратегии
 
-[Cтратегии для Youtube](https://github.com/StressOzz/Zapret-Manager/blob/main/Strategies_For_Youtube.md)
+- [Cтратегии для Youtube](https://github.com/StressOzz/Zapret-Manager/blob/main/Strategies_For_Youtube.md)
+- [Cтратегии используемые в скрипте](https://github.com/StressOzz/Zapret-Manager/blob/main/Strategies.md)
 
-## 🔹 Стратегии используемые в скрипте
-
-### В скрипте, в 4 пункте есть  - Тестировать `v` и `Flowseal` стратегии
-
-[Cтратегии используемые в скрипте](https://github.com/StressOzz/Zapret-Manager/blob/main/Strategies.md)
-
----
-
-[<img width="190" height="175" alt="donate-button-click-donation-charity-600nw-2339825981" src="https://github.com/user-attachments/assets/2999757b-fbf3-4149-bf6c-48bf3e241529" />](https://github.com/StressOzz#-поддержать-проект)
-
----
-
-## 🔹 Настройка Telegram
-
-**Пункт 5** —  установка или удаление **TG WS Proxy**
-> **TG WS Proxy Go** для архитектур **aarch64**, **armv7**, **x86_64**, **mipsel** и **mips**
->
-> **TG WS Proxy Rust** для архитектур **aarch64**, **armv7**, **x86_64** и **mipsel**
+## 🔹 Telegram
 
 В **Telegram Desktop**:
 - Настройки **→** Продвинутые настройки **→** Тип соеденения **→** Добавить прокси
@@ -139,6 +204,51 @@ zms
 
 ---
 
+## 🔹 Mixomo
+
+- Интегрировать **VPN** подписку в **Mihomo**
+
+   Вставьте ссылку на свою подписку.
+   Можете воспользоваться [**StressKVN**](https://github.com/StressOzz/StressKVN)
+
+   Зайдите на http://192.168.1.1:9090/ui 
+   в поле **Хост** введите **192.168.1.1**
+   во вкладке **Прокси** выберите **Сервер для YouTube** и **Сервер для остального трафика** который поёдйт через списки **MagiTrickle**
+   
+- Сгенерируйте **WARP** 
+ 
+   Для генерации **WARP** через скрипт понадобится установить **[Zapret](https://github.com/StressOzz/Zapret-Manager)**
+   
+- Интегрируйте **WARP**
+
+   Для интеграции своего **WARP** файла - скиньте его в `/root/WARP.conf`
+   
+- Зайдите на http://192.168.1.1:8080/ выберите списки, которые Вам нужны, нажмите **Сохранить изменения**
+
+- Можете выбрать и установить панель для управления **Mihomo** - пункт **7**
+
+- Можете включить автоперезапуск **Mihomo** - может помочь при использовании сгенерированных warp
+
+---
+
+## 🔹 Тест стратегий из **/root/custom_test.txt**
+
+Каждая стратегия должна начинаться со строки **#Название**
+
+Пример содержимого `/root/custom_test.txt`:
+```
+#Strategy1
+--filter-tcp=443
+--dpi-desync=fake
+. . .
+#Strategy2
+--filter-tcp=443
+--dpi-desync=multidisorder
+. . .
+```
+
+---
+
 ## 🔹 Дерево меню Zapret Manager
 
 
@@ -146,110 +256,211 @@ zms
 <summary>Нажмите, чтобы развернуть</summary>
 
 ```text
-┌─ 1 Установить / Удалить / Обновить Zapret
-│
-├─ 2 Запустить / Остановить Zapret
-│
-├─ 3 Меню стратегий
-│  ├─ 1 Выбрать и установить стратегию v1–v9
-│  ├─ 2 Выбрать и установить стратегию от Flowseal
-│  ├─ 3 Выбрать и установить стратегию для YouTube
-│  ├─ 4 Выбрать и установить стратегию для игр
-│  ├─ 5 Включить / Выключить обход по спискам РКН
-│  ├─ 6 Обновить список исключений
-│  └─ Enter Выход в главное меню
-│
-├─ 4 Меню тестирование стратегий
-│  ├─1 Тестировать стратегии v
-│  ├─2 Тестировать стратегии Flowseal
-│  ├─3 Тестировать v и Flowseal стратегии
-│  ├─4 Тестировать текущую стратегию
-│  ├─5 Тестировать стратегии по домену
-│  ├─6 Тестировать стратегии для YouTube
-│  ├─9 Результаты тестирования стратегий
-│  ├─0 Удалить результаты тестования
-│  └─ Enter Выход в главное меню
-│
-├─ 5 Меню TG WS Proxy 
-│  ├─1 Установить / Удалить TG WS Proxy Go
-│  ├─2 Установить / Удалить TG WS Proxy Go
-│  └─ Enter Выход в главное меню
-│
-├─ 6 Меню DNS over HTTPS
-│  ├─ 1 Установить / Удалить DNS over HTTPS
-│  ├─ 2 Настроить Comss DNS
-│  ├─ 3 Настроить Xbox DNS
-│  ├─ 4 Настроить dns.malw.link
-│  ├─ 5 Настроить dns.malw.link через Cloudflare
-│  ├─ 6 Настроить dns.mafioznik.xyz
-│  ├─ 7 Настроить dns.astracat.ru
-│  ├─ 0 Вернуть настройки DNS по умолчанию
-│  └─ Enter Выход в главное меню
-│
-├─ 7 Меню настройки Discord
-│  ├─ 1 Установить скрипт 50-stun4all
-│  ├─ 2 Установить скрипт 50-quic4all
-│  ├─ 3 Установить скрипт 50-discord-media
-│  ├─ 4 Установить скрипт 50-discord
-│  ├─ 5 Удалить скрипт Discord
-│  ├─ 6 Добавить Финские IP-адреса в hosts
-│  ├─ 7 Выбрать и установить стратегию для discord.media
-│  └─ Enter Выход в главное меню
-│
-├─ 8 Меню управления доменами в hosts
-│  ├─ 0 Добавить / Удалить nalog.ru
-│  ├─ 1 Добавить / Удалить rutor.info
-│  ├─ 2 Добавить / Удалить ntc.party
-│  ├─ 3 Добавить / Удалить Instagram* & Facebook*
-│  ├─ 4 Добавить / Удалить lib.rus.ec
-│  ├─ 5 Добавить / Удалить AI сервисы
-│  ├─ 6 Добавить / Удалить Twitch
-│  ├─ 7 Добавить / Удалить Telegram Web
-│  ├─ 8 Добавить / Удалить Spotify
-│  ├─ 9 Добавить / Удалить Supercell
-│  ├─10 Добавить / Удалить все домены
-│  ├─11 Восстановить hosts
-│  └─Enter Выход в главное меню
-│
-├─ 9 Удалить → установить → настроить Zapret
-│
-└─ 0 Системное меню
-   ├─ 1 Показать системную информацию
-   ├─ 2 Активировать доступ к скрипту из браузера
-   ├─ 3 Включить блокировку QUIC (порты 80 и 443)
-   ├─ 4 Меню выбора зеркала OpenWrt
-   │  ├─1 China
-   │  ├─2 Germany
-   │  ├─3 Belgium
-   │  ├─4 Kazakhstan
-   │  ├─5 Netherlands
-   │  ├─6 default / OpenWrt
-   │  └─Enter Выход в системное меню
-   │
-   ├─ 5 Запустить проверку blockcheck
-   ├─ 6 Удалить Zapret
-   ├─ 7 Сделать / Удалить резервную копию настроек Zapret
-   ├─ 8 Восстановить настройки Zapret из резервной копии
-   ├─ 9 Включить / Выключить IPv6 в Zapret
-   ├─ 0 Применить FIX для Flow Offloading
-   └─ Enter Выход в главное меню
+─ 1 Установить / Удалить / Обновить Zapret
+
+─ 2 Меню стратегий
+  ├─ 0 Меню тестирование стратегий
+  │  ├─ 1 Тестирование стратегий v / Flowseal
+  │  │  ├─ 1 Тестировать стратегии v
+  │  │  ├─ 2 Тестировать стратегии Flowseal
+  │  │  ├─ 3 Тестировать v и Flowseal стратегии
+  │  │  └─ Enter Выход в меню тестирования стратегий 
+  │  ├─ 2 Тестировать текущую стратегию
+  │  ├─ 3 Тестировать стратегии по домену
+  │  ├─ 4 Тестировать стратегии для YouTube
+  │  ├─ 5 Тестировать стратегии из /root/custom_test.txt
+  │  ├─ 6 Меню автоподбора стратегий по расписанию
+  │  │  ├─ 1 Включить автоподбор по расписанию / Изменить время автоподбора по расписанию
+  │  │  ├─ 2 Отключить автоподбор по расписанию
+  │  │  ├─ 3 Запустить автоподбор в фоне / Остановить автоподбор в фоне
+  │  │  ├─ 4 Показать результаты последнего теста
+  │  │  ├─ 5 Показать полный лог последнего теста
+  │  │  ├─ 6 Настроить время на роутере
+  │  │  │  ├─ 1 Синхронизировать время через NTP
+  │  │  │  ├─ 2 Установить часовой пояс
+  │  │  │  └─ Enter Выход в меню автоподбора стратегий
+  │  │  ├─ 7 Удалить результаты теста и лог
+  │  │  └─ Enter) Выход в меню тестирования
+  │  ├─ 6 Результаты тестирования по домену
+  │  ├─ 7 Результаты тестирования стратегий
+  │  ├─ 8 Результаты тестирования Custom стратегий  
+  │  ├─ 0 Удалить результаты тестования
+  │  └─ Enter Выход в главное меню
+  │ 
+  ├─ 1 Выбрать и установить стратегию v1–v9
+  ├─ 2 Выбрать и установить стратегию от Flowseal
+  ├─ 3 Выбрать и установить стратегию для YouTube
+  ├─ 4 Меню управления стратегиями для игр
+  │  ├─ 1 Установить / Удалить Gv1
+  │  ├─ 2 Установить / Удалить Gv2
+  │  ├─ 3 Установить / Удалить Gv3
+  │  ├─ 4 Установить / Удалить Gv4
+  │  ├─ 5 Выбрать и сменить fake
+  │  │  ├─1 Сменить на stun.bin
+  │  │  ├─2 Сменить на quic_initial_4pda.to.bin
+  │  │  ├─3 Сменить на quic_initial_dbankcloud_ru.bin
+  │  │  └─Enter Выход в меню стратегий 
+  │  └─ Enter Выход в меню стратегий
+  │
+  ├─ 5 Включить / Выключить обход по спискам РКН
+  ├─ 6 Обновить список исключений
+  ├─ 7 Добавить в стратегию блок с --wssize 1:6
+  ├─ 8 Добавить в стратегию блок с --methodeol
+  ├─ 9 Добавить в стратегию блок с --filter-udp=443
+  └─ Enter Выход в главное меню
+
+- 3 Меню splify
+  ├─ 1 Установить / Обновить splify
+  ├─ 2 Удалить splify
+  ├─ 3 Сгенерировать и применить WARP
+  │  ├─ 1 Использовать engage.cloudflareclient.com:4500
+  │  └─ 2 Подобрать endpoint автоматически
+  ├─ 4 Перезапустить splify
+  └─  Enter Выход в главное меню
+
+─ 4 Меню Mixomo
+  ├─ 1 Установить Mixomo
+  ├─ 2 Удалить Mixomo
+  ├─ 3 Сменить список MagiTrickle
+  ├─ 4 Интегрировать / сменить VPN подписку в Mihomo
+  ├─ 5 Сгенерировать WARP в /root/WARP.conf
+  ├─ 6 Интегрировать /root/WARP.conf в Mihomo
+  ├─ 7 Выбрать и установить панель для Mihomo
+  ├─ 8 Включить / Выключить автоперезапуск Mihomo
+  ├─ 9 Обновить MagiTrickle
+  └─ Enter Выход в главное меню
+
+─ 5 Меню NetShift
+  ├─ 1 Установить / Удалить / Обновить NetShift
+  ├─ 2 Установить ByeDPI / Удалить ByeDPI
+  ├─ 3 Установить / Удалить AmneziaWG
+  ├─ 4 Установить / Удалить интерфейс AWG
+  ├─ 5 Интегрировать VPN подписку в NetShift / Сменить VPN подписку в NetShift
+  ├─ 6 Интегрировать AWG в NetShift
+  ├─ 6 Интегрировать ByeDPI в NetShift  
+  └─ Enter Выход в главное меню
+  
+─ 6 Меню TG WS Proxy 
+  ├─ 1 Установить / Удалить TG WS Proxy Go SOCKS5
+  ├─ 2 Установить / Удалить TG WS Proxy Rust
+  ├─ 3 Установить / Удалить TG WS Proxy Go MTProto
+  ├─ 4 Удалить все TG WS Proxy
+  └─ Enter Выход в главное меню
+
+─ 7 Меню DNS over HTTPS
+  ├─  1 Установить / Удалить DNS over HTTPS
+  ├─  2 Настроить Comss DNS
+  ├─  3 Настроить Xbox DNS
+  ├─  4 Настроить dns.malw.link
+  ├─  5 Настроить dns.malw.link через Cloudflare
+  ├─  6 Настроить dns.mafioznik.xyz
+  ├─  7 Настроить dns.astracat.ru
+  ├─  8 Настроить dns.nullsproxy.com (Supercell)
+  ├─  9 Настроить Cloudflare DNS
+  ├─  0 Настроить Google DNS
+  ├─ 10 Вернуть настройки по умолчанию
+  └─ Enter Выход в главное меню
+
+─ 8 Меню настройки Discord
+  ├─ 1 Установить скрипт 50-stun4all
+  ├─ 2 Установить скрипт 50-quic4all
+  ├─ 3 Установить скрипт 50-discord-media
+  ├─ 4 Установить скрипт 50-discord
+  ├─ 5 Удалить скрипт Discord
+  ├─ 6 Добавить Финские IP-адреса в hosts
+  ├─ 7 Выбрать и установить стратегию для discord.media
+  ├─ 8 Меню выбора fake для discord,stun
+  │  ├─ 1 Сменить на stun.bin
+  │  ├─ 2 Сменить на quic_initial_www_google_com.bin
+  │  ├─ 3 Сменить на quic_initial_dbankcloud_ru.bin
+  │  └─ Enter Выход в меню настройки Discord
+  │  
+  └─ Enter Выход в главное меню
+
+─ 9 Меню управления доменами в hosts
+  ├─  0 Добавить / Удалить nalog.ru
+  ├─  1 Добавить / Удалить rutor.info
+  ├─  2 Добавить / Удалить ntc.party
+  ├─  3 Добавить / Удалить Instagram* & Facebook*
+  ├─  4 Добавить / Удалить lib.rus.ec
+  ├─  5 Добавить / Удалить AI сервисы
+  ├─  6 Добавить / Удалить Twitch
+  ├─  7 Добавить / Удалить Telegram Web
+  ├─  8 Добавить / Удалить Spotify
+  ├─  9 Добавить / Удалить Supercell
+  ├─ 10 Добавить / Удалить githubusercontent.com
+  ├─ 11 Добавить / Удалить  github.com
+  ├─ 12 Добавить / Удалить  Ubisoft
+  ├─ 13 Добавить / Удалить  tapeop.dev
+  ├─ 14 Добавить / Удалить все домены
+  ├─ 15 Заменить hosts на GeoHide hosts
+  ├─ 16 Заменить hosts на Mafioznik hosts
+  ├─ 17 Заменить hosts на Malw.link hosts
+  ├─ 18 Восстановить hosts
+  └─Enter Выход в главное меню
+
+─ f/F/А/а Удалить → установить → настроить Zapret
+
+─ 0 Системное меню
+  ├─ 1 Показать системную информацию
+  ├─ 2 Активировать доступ к скрипту из браузера
+  ├─ 3 Включить блокировку QUIC (порты 80 и 443)
+  ├─ 4 Меню выбора зеркала OpenWrt
+  │  ├─ 1 China
+  │  ├─ 2 Germany
+  │  ├─ 3 Belgium
+  │  ├─ 4 Kazakhstan
+  │  ├─ 5 Netherlands
+  │  ├─ 6 default / OpenWrt
+  │  └─Enter Выход в системное меню
+  │
+  ├─ 5 Запустить проверку blockcheck
+  ├─ 6 Удалить Zapret
+  ├─ 7 Сделать / Удалить резервную копию настроек Zapret
+  ├─ 8 Восстановить настройки Zapret из резервной копии
+  ├─ 9 Включить / Выключить IPv6 в Zapret
+  ├─ 0 Применить FIX для Flow Offloading
+  └─ Enter Выход в главное меню
+
+─ s/S/Ы/ы Запустить / Остановить Zapret
 ```
 
 </details>
 
 ---
 
-[![Star History Chart](https://api.star-history.com/svg?repos=StressOzz/Zapret-Manager&type=date&legend=top-left)](https://www.star-history.com/#StressOzz/Zapret-Manager&type=date&legend=top-left)
+<table>
+  <tr>
+    <td>
+      <a href="https://github.com/StressOzz#-поддержать-проект">
+        <img width="280" height="130" src="https://github.com/user-attachments/assets/2999757b-fbf3-4149-bf6c-48bf3e241529">
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/StressOzz/StressKVN">
+        <img width="280" height="130" alt="image" src="https://github.com/user-attachments/assets/519a126e-bd39-4f46-8a09-3f0d6e1dd8af">
+      </a>
+    </td>
+  </tr>
+</table>
 
 ---
 
-
 # Благодарности:
 
+- **Zapret** by [*bol-van*](https://github.com/bol-van)
 - **Zapret-OpenWrt** by [*remittor*](https://github.com/remittor)
 - **Стратегии от Flowseal** by [*Flowseal*](https://github.com/Flowseal)
-- **TG WS Proxy Go** by [*byd0mhate*](https://github.com/d0mhate)
+- **NetShift** by [*yandexru45*](https://github.com/yandexru45)
+- **splify** - by [*xyzmean*](https://github.com/xyzmean/)
+- **Mixomo** by [*Internet Helper*](https://github.com/Internet-Helper)
+- **MagiTrickle** by [*Ponywka*](https://github.com/Ponywka)
+- **HevSocks5Tunnel** by [*hev*](https://github.com/heiher)
+- **AWG OpenWrt** by [*Slava-Shchipunov*](https://github.com/Slava-Shchipunov)
+- **TG WS Proxy SOCKS5** by [*byd0mhate*](https://github.com/d0mhate)
 - **TG WS Proxy Rust** by [*valnesfjord*](https://github.com/valnesfjord)
+- **TG WS Proxy MTProto** by [*spatiumstas*](https://github.com/spatiumstas)
+- **ByeDPI-OpenWrt** by [*DPITrickster*](https://github.com/DPITrickster)
 
 ---
 
